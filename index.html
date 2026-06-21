@@ -1929,8 +1929,12 @@ function addToSessionModal(){
     lib.filter(s=>selected.has(s.id)).forEach(s=>session.push({...s,qid:uid()}));
     save();closeModal();renderSetup();
   };
+  window._createForSession=()=>{
+    addStretchModal({onSave:s=>{session.push({...s,qid:uid()});save();renderSetup();addToSessionModal();}});
+  };
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:12px">Add stretches</p>
     <input class="fi" id="m-add-search" placeholder="Search stretches…" oninput="_addSearch()" style="margin-bottom:12px">
+    <button class="btn" style="width:100%;margin-bottom:12px" onclick="_createForSession()">+ create new stretch</button>
     <div id="m-add-list" style="max-height:50vh;overflow-y:auto"></div>
     <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
       <span id="m-add-count" style="flex:1;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace"></span>
@@ -1939,7 +1943,8 @@ function addToSessionModal(){
     </div>`);
   renderList();
 }
-function addStretchModal(){
+function addStretchModal(opts){
+  window._addStretchOpts=opts||null;
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:14px">Custom stretch</p>
     <label class="fl">Name</label><input class="fi" id="m-cn" placeholder="e.g. Side bend">
     <label class="fl">Category</label><select class="fi" id="m-ca">${CATS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select>
@@ -1948,13 +1953,17 @@ function addStretchModal(){
     <label class="fl">Duration (seconds)</label><input class="fi" type="number" id="m-cdur" value="30" min="5" max="300">
     <div style="display:flex;align-items:center;gap:10px;margin:8px 0"><label class="tog"><input type="checkbox" id="m-cbil"><span class="tog-sl"></span></label><div style="font-size:13px">Bilateral (switch-side alert)</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label class="tog"><input type="checkbox" id="m-cpnf"><span class="tog-sl"></span></label><div style="font-size:13px">PNF (tense/relax)</div></div>
-    <div style="display:flex;gap:8px"><button class="btn ac" style="flex:1" onclick="confirmAddStretch()">Add to library</button><button class="btn" onclick="closeModal()">Cancel</button></div>`);
+    <div style="display:flex;gap:8px"><button class="btn ac" style="flex:1" onclick="confirmAddStretch()">${opts&&opts.onSave?'Add':'Add to library'}</button><button class="btn" onclick="closeModal()">Cancel</button></div>`);
   setTimeout(()=>document.getElementById('m-cn')?.focus(),80);
 }
 function confirmAddStretch(){
   const n=document.getElementById('m-cn')?.value.trim();if(!n)return;
-  lib.push({id:slugId(n),name:n,area:document.getElementById('m-ca').value,cat:document.getElementById('m-ca').value,desc:document.getElementById('m-cd').value.trim(),cues:document.getElementById('m-cc').value.trim(),dur:+document.getElementById('m-cdur').value||30,bilateral:document.getElementById('m-cbil').checked,pnf:document.getElementById('m-cpnf').checked});
-  save();closeModal();renderLib();
+  const s={id:slugId(n),name:n,area:document.getElementById('m-ca').value,cat:document.getElementById('m-ca').value,desc:document.getElementById('m-cd').value.trim(),cues:document.getElementById('m-cc').value.trim(),dur:+document.getElementById('m-cdur').value||30,bilateral:document.getElementById('m-cbil').checked,pnf:document.getElementById('m-cpnf').checked};
+  lib.push(s);
+  save();
+  const opts=window._addStretchOpts;window._addStretchOpts=null;
+  if(opts&&opts.onSave){closeModal();opts.onSave(s);}
+  else{closeModal();renderLib();}
 }
 
 /* ── EXPORT / IMPORT ── */
