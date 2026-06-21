@@ -146,7 +146,7 @@ function field(id,key,orig,label,multiline,hint){
   return lab+'<input class="fi'+ch+'" value="'+esc(v)+'" oninput="onEdit(\''+id+'\',\''+key+'\',this.value)">';
 }
 
-function render(){
+function render(scrollTop){
   const s=LIB[idx];
   const e=edits[s.id]||{};
   document.getElementById('total').textContent=LIB.length;
@@ -199,7 +199,7 @@ function render(){
     '<div class="flag-bar"><button class="chip'+(e.remove?' on':'')+'" onclick="toggleRemove(\''+s.id+'\')">'+(e.remove?'✓ marked for removal':'mark for removal')+'</button>'+
       (isTouched(s.id)?'<button class="chip" onclick="clearOne(\''+s.id+'\')">clear edits</button>':'')+'</div>'+
     '<div class="id-row">id: <b>'+s.id+'</b> · photo: <b>photos/'+s.id+'.jpg</b></div>';
-  window.scrollTo(0,0);
+  if(scrollTop)window.scrollTo(0,0);
 }
 
 window.onEdit=function(id,key,v){
@@ -269,8 +269,8 @@ window.pickPhoto=function(id){
   };
   inp.click();
 };
-function go(d){ idx=Math.max(0,Math.min(LIB.length-1,idx+d)); saveState(); render(); }
-window.jumpTo=function(v){ const n=parseInt(v,10); if(n>=1&&n<=LIB.length){ idx=n-1; saveState(); render(); } };
+function go(d){ idx=Math.max(0,Math.min(LIB.length-1,idx+d)); saveState(); render(true); }
+window.jumpTo=function(v){ const n=parseInt(v,10); if(n>=1&&n<=LIB.length){ idx=n-1; saveState(); render(true); } };
 let toastT; function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove('show'),1600); }
 window.exportEdits=function(){
   const out={generated:new Date().toISOString(),app:'limber-review',version:2,count:Object.keys(edits).filter(isTouched).length,edits:{}};
@@ -280,7 +280,7 @@ window.exportEdits=function(){
   toast(out.count+' edits exported');
 };
 document.addEventListener('keydown',e=>{ if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA')return; if(e.key==='ArrowRight')go(1); if(e.key==='ArrowLeft')go(-1); });
-render();
+render(true);
 </script>
 </body>
 </html>
