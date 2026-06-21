@@ -472,9 +472,6 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
         <button class="btn sm" onclick="document.getElementById('import-input').click()">Import</button></div>
     </div>
     <div style="padding:8px 16px 0"><span style="font-size:11px;color:var(--muted)">All data is stored on this device. Export regularly to keep a backup.</span></div>
-
-    <span class="sec-lbl" style="margin-top:18px">Storage</span>
-    <div id="storage-usage-card"></div>
   </div>
 </div>
 
@@ -507,15 +504,14 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 <script>
 // stretch library (270 built-ins) — categories assigned via CAT map below
 const CATS=['Neck','Chest','Back','Core','Biceps','Triceps','Forearms','Wrists','Glutes','Hips','Hamstrings','Quads','Calves','Ankles','Twists','Mobility','Dynamic','Balance','Floss','Restorative'];
-const CAT={"neck-side":"Neck","neck-flexor":"Neck","neck-extensor":"Neck","chin-to-chest":"Neck","chin-tuck":"Neck","rotating-neck":"Neck","neck-circle":"Neck","seated-neck-side":"Neck","seated-sky-look":"Neck","ceiling-look":"Neck","forward-flexion-neck":"Neck","front-back-neck":"Neck","side-push-neck":"Neck","seated-neck-tap":"Neck","kneeling-neck":"Neck","bent-arm-chest":"Chest","above-head-chest":"Chest","humble-warrior":"Chest","fish":"Chest","crab":"Chest","kneeling-chest":"Chest","seated-chest-clam":"Chest","chest-front-shoulder":"Chest","behind-head-chest":"Chest","back-pec":"Chest","standing-one-arm-chest":"Chest","reverse-chest":"Chest","superman-chest":"Chest","reaching-upper-back":"Back","cat-pose":"Back","cow-stretch":"Back","cobra":"Back","sphinx":"Back","upward-dog":"Back","puppy-pose":"Back","knee-to-chest":"Back","lying-knee-to-chest":"Back","double-knee-to-chest":"Back","lying-lower-back":"Back","seated-lower-back":"Back","middle-back":"Back","upper-back":"Back","back-stretch":"Back","bow-pose":"Back","camel":"Back","bridge":"Back","wheel":"Back","plow":"Back","spine-stretch-forward":"Back","kneeling-lat":"Back","one-arm-lat":"Back","side-lat":"Back","dead-hang":"Back","wrist-flexor":"Wrists","wrist-extensor":"Wrists","wrist-circles":"Wrists","kneeling-wrist-flexor":"Wrists","reverse-prayer":"Wrists","finger-extension":"Forearms","finger-flexor":"Forearms","thumb-stretch":"Forearms","forearm-pronator":"Forearms","elbow-flexor":"Biceps","elbows-back":"Biceps","overhead-triceps":"Triceps","triceps-stretch":"Triceps","cow-face":"Triceps","pigeon":"Glutes","half-pigeon":"Glutes","double-pigeon":"Glutes","fire-log":"Glutes","seated-glute":"Glutes","lying-glute":"Glutes","seated-piriformis":"Glutes","figure-four":"Glutes","pretzel":"Glutes","standing-knee-to-chest":"Glutes","butterfly":"Hips","frog":"Hips","happy-baby":"Hips","low-lunge":"Hips","high-lunge":"Hips","kneeling-hip-flexor":"Hips","standing-hip-flexor":"Hips","lizard":"Hips","garland":"Hips","90-90":"Hips","seated-groin":"Hips","adductor":"Hips","side-lunge-adductor":"Hips","sitting-wide-adductor":"Hips","runners-stretch":"Hips","warrior-1":"Hips","warrior-2":"Hips","lotus":"Hips","standing-iliotibial":"Hips","standing-leg-cross-abductor":"Hips","standing-outer-hip":"Hips","lying-hip-flexor":"Hips","kneeling-iliopsoas":"Hips","crossover-kneeling-hip-flexor":"Hips","hip-extension":"Hips","hip-external-rotator":"Hips","seated-hip-external-rotation":"Hips","lying-abductor":"Hips","recumbent-hip":"Hips","side-split":"Hips","split-sprinter-lunge":"Hips","lunge-stretch":"Hips","kneeling-sartorius":"Hips","thread-the-needle":"Twists","seated-back-twist":"Twists","supine-twist":"Twists","lying-knee-roll":"Twists","standing-back-rotation":"Twists","kneeling-back-rotation":"Twists","rotating-stomach":"Twists","seated-rotation":"Twists","standing-abs-rotation":"Twists","revolved-triangle":"Twists","revolved-side-angle":"Twists","open-book":"Twists","kneeling-tspine":"Twists","seated-spinal-twist":"Twists","lying-crossover":"Twists","squat-mobility-twist":"Twists","twisted-leg-lunge":"Twists","spine-twist":"Twists","side-twist":"Twists","big-turn-back":"Twists","lying-upper-body-rotation":"Twists","standing-low-body-rotation":"Twists","standing-upper-body-rotation":"Twists","twist-step":"Twists","bent-over-twist":"Twists","standing-wring-towel":"Twists","windshield-wipers":"Twists","windmills":"Twists","scorpion":"Twists","standing-hamstring":"Hamstrings","standing-high-hamstring":"Hamstrings","seated-single-hamstring":"Hamstrings","leg-up-hamstring":"Hamstrings","basic-toe-touch":"Hamstrings","spread-leg-fold":"Hamstrings","wide-leg-fold":"Hamstrings","stand-spread-fold":"Hamstrings","downward-dog":"Hamstrings","standing-forward-bend":"Hamstrings","hands-to-feet":"Hamstrings","pyramid":"Hamstrings","front-hamstring":"Hamstrings","standing-hamstrings-back":"Hamstrings","standing-quad":"Quads","standing-balance-quad":"Quads","lying-quad":"Quads","seated-quad":"Quads","all-fours-quad":"Quads","couch-stretch":"Quads","chair-pose":"Quads","hero":"Quads","calf-wall":"Calves","calves-stretch":"Calves","standing-gastroc":"Calves","lunging-calf":"Calves","standing-achilles":"Calves","seated-calf":"Calves","seated-straight-calf":"Calves","heel-press":"Calves","standing-toe-up-calf":"Calves","lying-calf":"Calves","frog-rock":"Ankles","standing-shin":"Ankles","standing-tibialis":"Ankles","ankle-circles":"Ankles","feet-ankles-rotation":"Ankles","seated-ankle":"Ankles","plantar-flexion":"Ankles","peroneals":"Ankles","posterior-tibialis":"Ankles","standing-side-bend":"Core","standing-lateral":"Core","standing-side-stretch":"Core","abdominal-stretch":"Core","triangle":"Core","extended-side-angle":"Core","reverse-warrior":"Core","gate-pose":"Core","boat-pose":"Core","crescent-moon":"Core","standing-half-bend":"Core","standing-lateral-side":"Core","standing-two-side-bend":"Core","floss-sciatic":"Floss","floss-median":"Floss","floss-ulnar":"Floss","floss-radial":"Floss","floss-femoral":"Floss","child-pose":"Restorative","legs-up-wall":"Restorative","corpse":"Restorative","crocodile":"Restorative","animal-resting":"Restorative","arm-circles":"Dynamic","standing-arms-circling":"Dynamic","leg-swings-front":"Dynamic","leg-swings-side":"Dynamic","worlds-greatest":"Dynamic","toy-soldier":"Dynamic","front-leg-kick":"Dynamic","inchworm":"Dynamic","rocker-open-legs":"Dynamic","side-kick":"Dynamic","leg-to-side":"Dynamic","single-straight-leg":"Dynamic","double-leg-stretch":"Dynamic","overhead-clap":"Dynamic","rollover":"Dynamic","half-sun-salutation":"Dynamic","standing-hip-openers":"Dynamic","elephant-walks":"Dynamic","butterfly-flaps":"Dynamic","rocking-frog":"Dynamic","cross-over-shoulder":"Mobility","reaching-up-shoulder":"Mobility","rear-deltoid":"Mobility","arm-up-rotator":"Mobility","reverse-shoulder":"Mobility","shoulder-circle":"Mobility","arm-crossover":"Mobility","cat-cow":"Mobility","child-to-cobra":"Mobility","deep-squat":"Mobility","dynamic-90-90":"Mobility","shin-box-switch":"Mobility","hip-circles":"Mobility","scapula-retraction":"Mobility","scapula-elevation":"Mobility","pelvic-tilt":"Mobility","standing-pelvic-tilt":"Mobility","cossack-squat":"Mobility","thoracic-bridge":"Mobility","flexion-extension-hip":"Mobility","half-seated-leg-circle":"Mobility","side-lying-leg-circle":"Mobility","lying-single-leg-circle":"Mobility","potty-squat":"Mobility","full-squat-mobility":"Mobility","external-shoulder-rotation":"Mobility","internal-shoulder-rotation":"Mobility","rotator-cuff":"Mobility","elbow-out-rotator":"Mobility","forearm-wall-slide":"Mobility","serratus-wall-slide":"Mobility","prayer-squat":"Mobility","dolphin":"Mobility","mountain-pose":"Mobility","lying-shoulder-sweep":"Mobility","standing-back-extension-flexion":"Mobility","seated-shoulder-flexor-depressor-retractor":"Mobility","scapular-pushups":"Mobility","bent-over-pendulum":"Mobility","warrior-3":"Balance","tree-pose":"Balance","eagle-pose":"Balance","dancer":"Balance","half-moon":"Balance","hawaiian-squat":"Balance","standing-figure-four":"Balance","standing-balance-outer-hip":"Balance","standing-balance-hip-rotation":"Balance"};
+const CAT={"neck-side":"Neck","neck-flexor":"Neck","neck-extensor":"Neck","chin-tuck":"Mobility","rotating-neck":"Mobility","neck-circle":"Neck","seated-neck-side":"Neck","seated-sky-look":"Neck","front-back-neck":"Neck","bent-arm-chest":"Chest","above-head-chest":"Chest","humble-warrior":"Chest","fish":"Chest","crab":"Chest","kneeling-chest":"Chest","seated-chest-clam":"Chest","chest-front-shoulder":"Chest","back-pec":"Chest","reverse-chest":"Chest","superman-chest":"Core","cat-pose":"Back","cow-stretch":"Back","cobra":"Back","sphinx":"Back","upward-dog":"Back","puppy-pose":"Back","lying-knee-to-chest":"Back","double-knee-to-chest":"Back","lying-lower-back":"Twists","seated-lower-back":"Back","upper-back":"Back","bow-pose":"Back","camel":"Back","bridge":"Back","wheel":"Back","plow":"Back","one-arm-lat":"Back","side-lat":"Back","dead-hang":"Back","wrist-flexor":"Wrists","wrist-extensor":"Wrists","wrist-circles":"Wrists","kneeling-wrist-flexor":"Wrists","reverse-prayer":"Wrists","finger-extension":"Forearms","finger-flexor":"Forearms","thumb-stretch":"Forearms","forearm-pronator":"Forearms","elbow-flexor":"Biceps","elbows-back":"Biceps","overhead-triceps":"Triceps","triceps-stretch":"Triceps","cow-face":"Triceps","pigeon":"Glutes","half-pigeon":"Glutes","double-pigeon":"Glutes","seated-glute":"Glutes","lying-glute":"Glutes","seated-piriformis":"Glutes","figure-four":"Glutes","pretzel":"Glutes","standing-knee-to-chest":"Glutes","butterfly":"Hips","frog":"Hips","happy-baby":"Hips","low-lunge":"Hips","high-lunge":"Hips","kneeling-hip-flexor":"Hips","standing-hip-flexor":"Hips","lizard":"Hips","garland":"Hips","90-90":"Hips","adductor":"Hips","side-lunge-adductor":"Hips","runners-stretch":"Hips","warrior-1":"Hips","warrior-2":"Hips","lotus":"Hips","standing-iliotibial":"Hips","standing-leg-cross-abductor":"Hips","lying-hip-flexor":"Hips","kneeling-iliopsoas":"Hips","crossover-kneeling-hip-flexor":"Hips","hip-extension":"Hips","hip-external-rotator":"Hips","seated-hip-external-rotation":"Hips","lying-abductor":"Hips","recumbent-hip":"Hips","side-split":"Hips","lunge-stretch":"Hips","kneeling-sartorius":"Hips","thread-the-needle":"Twists","seated-back-twist":"Twists","supine-twist":"Twists","lying-knee-roll":"Twists","standing-back-rotation":"Twists","kneeling-back-rotation":"Twists","rotating-stomach":"Twists","seated-rotation":"Twists","standing-abs-rotation":"Twists","revolved-triangle":"Twists","revolved-side-angle":"Twists","open-book":"Twists","kneeling-tspine":"Twists","seated-spinal-twist":"Twists","lying-crossover":"Twists","squat-mobility-twist":"Twists","twisted-leg-lunge":"Twists","spine-twist":"Twists","side-twist":"Twists","big-turn-back":"Twists","lying-upper-body-rotation":"Twists","standing-low-body-rotation":"Twists","standing-upper-body-rotation":"Twists","twist-step":"Twists","bent-over-twist":"Twists","standing-wring-towel":"Twists","windshield-wipers":"Twists","windmills":"Twists","scorpion":"Twists","standing-hamstring":"Hamstrings","standing-high-hamstring":"Hamstrings","seated-single-hamstring":"Hamstrings","leg-up-hamstring":"Hamstrings","spread-leg-fold":"Hamstrings","wide-leg-fold":"Hamstrings","stand-spread-fold":"Hamstrings","downward-dog":"Hamstrings","standing-forward-bend":"Hamstrings","hands-to-feet":"Hamstrings","pyramid":"Hamstrings","front-hamstring":"Hamstrings","standing-balance-quad":"Quads","lying-quad":"Quads","all-fours-quad":"Quads","couch-stretch":"Quads","chair-pose":"Quads","hero":"Quads","calf-wall":"Calves","calves-stretch":"Calves","standing-gastroc":"Calves","lunging-calf":"Calves","standing-achilles":"Calves","seated-calf":"Calves","seated-straight-calf":"Calves","heel-press":"Calves","standing-toe-up-calf":"Calves","lying-calf":"Calves","frog-rock":"Ankles","standing-shin":"Ankles","standing-tibialis":"Ankles","ankle-circles":"Ankles","feet-ankles-rotation":"Ankles","seated-ankle":"Ankles","plantar-flexion":"Ankles","peroneals":"Ankles","posterior-tibialis":"Ankles","standing-side-bend":"Core","abdominal-stretch":"Core","triangle":"Core","extended-side-angle":"Core","reverse-warrior":"Core","gate-pose":"Core","boat-pose":"Core","crescent-moon":"Core","standing-half-bend":"Core","floss-sciatic":"Floss","floss-median":"Floss","floss-ulnar":"Floss","floss-radial":"Floss","floss-femoral":"Floss","child-pose":"Restorative","legs-up-wall":"Restorative","corpse":"Restorative","crocodile":"Restorative","animal-resting":"Restorative","arm-circles":"Dynamic","standing-arms-circling":"Dynamic","leg-swings-front":"Dynamic","leg-swings-side":"Dynamic","worlds-greatest":"Dynamic","toy-soldier":"Dynamic","front-leg-kick":"Dynamic","inchworm":"Dynamic","rocker-open-legs":"Dynamic","side-kick":"Dynamic","leg-to-side":"Dynamic","single-straight-leg":"Dynamic","double-leg-stretch":"Dynamic","overhead-clap":"Dynamic","rollover":"Dynamic","half-sun-salutation":"Dynamic","standing-hip-openers":"Dynamic","elephant-walks":"Dynamic","butterfly-flaps":"Dynamic","rocking-frog":"Dynamic","cross-over-shoulder":"Mobility","reaching-up-shoulder":"Mobility","rear-deltoid":"Mobility","arm-up-rotator":"Mobility","reverse-shoulder":"Mobility","shoulder-circle":"Mobility","arm-crossover":"Mobility","cat-cow":"Mobility","child-to-cobra":"Mobility","deep-squat":"Mobility","dynamic-90-90":"Mobility","shin-box-switch":"Mobility","hip-circles":"Mobility","scapula-retraction":"Mobility","scapula-elevation":"Mobility","pelvic-tilt":"Mobility","standing-pelvic-tilt":"Mobility","cossack-squat":"Mobility","thoracic-bridge":"Mobility","flexion-extension-hip":"Mobility","half-seated-leg-circle":"Mobility","side-lying-leg-circle":"Mobility","lying-single-leg-circle":"Mobility","potty-squat":"Mobility","full-squat-mobility":"Mobility","external-shoulder-rotation":"Mobility","internal-shoulder-rotation":"Mobility","rotator-cuff":"Mobility","elbow-out-rotator":"Mobility","forearm-wall-slide":"Mobility","serratus-wall-slide":"Mobility","prayer-squat":"Mobility","dolphin":"Mobility","mountain-pose":"Mobility","lying-shoulder-sweep":"Mobility","standing-back-extension-flexion":"Mobility","seated-shoulder-flexor-depressor-retractor":"Mobility","scapular-pushups":"Mobility","bent-over-pendulum":"Mobility","warrior-3":"Balance","tree-pose":"Balance","eagle-pose":"Balance","dancer":"Balance","half-moon":"Balance","hawaiian-squat":"Balance","standing-figure-four":"Balance","standing-balance-outer-hip":"Balance","standing-balance-hip-rotation":"Balance"};
 function catOf(s){if(s.cat)return s.cat;if(CAT[s.id])return CAT[s.id];const t=(s.type||'').toLowerCase();if(t==='dynamic')return'Dynamic';if(t==='mobility')return'Mobility';if(t==='restorative')return'Restorative';if(t==='balance')return'Balance';return({neck:'Neck',chest:'Chest',back:'Back',hips:'Hips',legs:'Hamstrings',core:'Core',shoulders:'Mobility',glide:'Floss'})[s.area]||'Mobility';}
 const DEFAULTS=[
 {id:"neck-side",name:"Neck Side Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Sitting or standing tall, gently tilt your head so your ear moves toward your shoulder until you feel a stretch along the opposite side of the neck.",cues:"Keep both shoulders down. Let the head be heavy — no forcing."},
 {id:"neck-flexor",name:"Neck Flexor Stretch",area:"neck",type:"static",dur:25,bilateral:false,desc:"Gently tip the head back to look up toward the ceiling, feeling a stretch along the front of the neck.",cues:"Small range. Stop if you feel any pinching at the back of the neck."},
 {id:"neck-extensor",name:"Neck Extensor Stretch",area:"neck",type:"static",dur:30,bilateral:false,desc:"Drop the chin toward the chest until you feel a stretch along the back of the neck.",cues:"Let the weight of the head do the work. Relax the shoulders."},
-{id:"chin-to-chest",name:"Chin to Chest Stretch",area:"neck",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Slowly lower your chin to your chest and hold, lengthening the back of the neck.",cues:"Breathe and soften. No need to pull with the hands."},
-{id:"chin-tuck",name:"Chin Tuck",area:"neck",type:"static",dur:20,bilateral:false,desc:"Draw the chin straight back, making a \"double chin,\" lengthening the back of the neck.",cues:"Keep eyes level. A retraction, not a nod."},
-{id:"rotating-neck",name:"Rotating Neck Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Slowly turn the head to look over one shoulder, feeling a stretch along the side of the neck. Switch sides.",cues:"Move slowly and smoothly. Keep the shoulders square."},
+{id:"chin-tuck",name:"Chin Tuck",area:"neck",type:"mobility",dur:20,bilateral:false,desc:"Draw the chin straight back, making a \"double chin,\" lengthening the back of the neck.",cues:"Keep eyes level. A retraction, not a nod."},
+{id:"rotating-neck",name:"Rotating Neck Stretch",area:"neck",type:"mobility",dur:30,bilateral:true,desc:"Slowly turn the head to look over one shoulder, feeling a stretch along the side of the neck. Switch sides.",cues:"Move slowly and smoothly. Keep the shoulders square."},
 {id:"neck-circle",name:"Neck Circle Stretch",area:"neck",type:"mobility",dur:30,bilateral:false,desc:"Slowly circle the head, dropping the chin toward the chest and around. Avoid rolling the head far back.",cues:"Move through the front range only. Slow and controlled."},
 {id:"seated-neck-side",name:"Seated Neck Side Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Seated tall, tilt the ear toward the shoulder. Optionally rest the hand over the head for gentle added weight.",cues:"Anchor the opposite shoulder down. Gentle, no pulling."},
 {id:"cross-over-shoulder",name:"Cross Over Shoulder Stretch",area:"shoulders",type:"static",dur:30,bilateral:true,desc:"Bring one arm straight across the chest and use the other arm to gently draw it closer.",cues:"Keep the shoulder down, away from the ear. Switch sides."},
@@ -530,7 +526,6 @@ const DEFAULTS=[
 {id:"above-head-chest",name:"Above Head Chest Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Clasp the hands overhead with palms up and gently press back and up to open the chest and shoulders.",cues:"Lengthen up, keep the ribs from flaring."},
 {id:"shoulder-circle",name:"Shoulder Circle",area:"shoulders",type:"mobility",dur:25,bilateral:false,desc:"Roll the shoulders in slow, full circles, forward then backward.",cues:"Big slow circles. Loosen with each rotation."},
 {id:"arm-crossover",name:"Arm Crossover",area:"shoulders",type:"static",dur:30,bilateral:true,desc:"Bring one arm across the body and gently press it toward the chest with the other arm.",cues:"Relax the shoulder down as you draw the arm in."},
-{id:"reaching-upper-back",name:"Reaching Upper Back Stretch",area:"back",type:"static",dur:30,bilateral:false,desc:"Interlace the fingers and reach the arms forward, rounding the upper back to stretch between the shoulder blades.",cues:"Push the hands away, spread the shoulder blades wide."},
 {id:"wrist-flexor",name:"Wrist Flexor Stretch",area:"shoulders",type:"static",dur:20,bilateral:true,desc:"Extend one arm with the palm up and gently pull the fingers down and back with the other hand.",cues:"Feel it along the inner forearm. Keep the elbow straight."},
 {id:"wrist-extensor",name:"Wrist Extensor Stretch",area:"shoulders",type:"static",dur:20,bilateral:true,desc:"Extend one arm with the palm down and gently pull the fingers down and back with the other hand.",cues:"Feel it along the top of the forearm. Gentle pressure."},
 {id:"wrist-circles",name:"Wrist Circles",area:"shoulders",type:"mobility",dur:20,bilateral:false,desc:"Make loose fists and circle the wrists slowly in both directions.",cues:"Full slow circles each way to warm the joints."},
@@ -548,18 +543,15 @@ const DEFAULTS=[
 {id:"puppy-pose",name:"Puppy Pose",area:"back",type:"static",dur:60,bilateral:false,desc:"From hands and knees, walk the hands forward and melt the chest toward the floor, hips staying over the knees.",cues:"Keep the hips high, let the heart sink down."},
 {id:"seated-back-twist",name:"Seated Back Twist",area:"back",type:"static",dur:35,bilateral:true,desc:"Seated, rotate the torso to one side, using the hand for gentle leverage. Switch sides.",cues:"Inhale tall, exhale to deepen the twist. Rotate from the spine."},
 {id:"supine-twist",name:"Supine Spinal Twist Yoga Pose",area:"back",type:"static",dur:45,bilateral:true,desc:"Lying on the back, draw one knee across the body toward the floor while keeping both shoulders down.",cues:"Gaze away from the knee. Let gravity do the work."},
-{id:"knee-to-chest",name:"Knee to Chest Stretch",area:"back",sub:"chest",type:"static",dur:30,bilateral:true,desc:"Lying on the back, draw one knee into the chest while the other leg stays extended or bent.",cues:"Relax the shoulders down. Switch sides."},
 {id:"lying-knee-to-chest",name:"Lying Knee to Chest Stretch",area:"back",sub:"chest",type:"static",dur:30,bilateral:true,desc:"On the back, hug one knee into the chest, keeping the lower back relaxed on the floor.",cues:"Draw the knee gently — no need to crank it."},
 {id:"double-knee-to-chest",name:"Pavanamuktasana Yoga Pose",area:"back",type:"static",dur:30,bilateral:false,desc:"Lying on the back, hug both knees into the chest and gently rock.",cues:"Massage the lower back into the floor. Breathe."},
 {id:"lying-lower-back",name:"Lying Lower Back Stretch",area:"back",type:"static",dur:40,bilateral:false,desc:"On the back, knees bent, gently let both knees drop to one side, then the other.",cues:"Keep the shoulders grounded. Slow side to side."},
 {id:"lying-knee-roll",name:"Lying Knee Roll Over Stretch",area:"back",type:"static",dur:40,bilateral:true,desc:"On the back with knees bent, roll both knees to one side and hold, feeling the stretch through the lower back and hip.",cues:"Let the knees be heavy. Switch sides."},
 {id:"seated-lower-back",name:"Seated Lower Back Stretch",area:"back",type:"static",dur:35,bilateral:false,desc:"Seated, fold forward over the legs, rounding the back gently to release the lower spine.",cues:"Let the head and arms hang heavy."},
 {id:"standing-back-rotation",name:"Standing Back Rotation Stretch",area:"back",type:"mobility",dur:35,bilateral:true,desc:"Standing with soft knees, rotate the torso side to side, letting the arms swing loosely.",cues:"Rotate from the waist. Stay relaxed."},
-{id:"middle-back",name:"Middle Back Stretch",area:"back",type:"static",dur:30,bilateral:false,desc:"Round the upper back forward, reaching the arms ahead to open between the shoulder blades.",cues:"Push the hands forward, widen the upper back."},
 {id:"upper-back",name:"Upper Back Stretch",area:"back",type:"static",dur:30,bilateral:false,desc:"Clasp the hands in front and round forward through the upper back, separating the shoulder blades.",cues:"Tuck the chin, hollow the chest."},
 {id:"child-to-cobra",name:"Child to Cobra Pose",area:"back",type:"mobility",dur:45,bilateral:false,desc:"Flow between child’s pose and cobra, moving the spine through flexion and extension.",cues:"Move slowly with the breath, segment by segment."},
 {id:"kneeling-back-rotation",name:"Kneeling Back Rotation Stretch",area:"back",type:"mobility",dur:35,bilateral:true,desc:"From hands and knees, place one hand behind the head and rotate the elbow up toward the ceiling, opening the chest.",cues:"Follow the elbow with your eyes. Switch sides."},
-{id:"back-stretch",name:"Back Stretch",area:"back",type:"static",dur:35,bilateral:false,desc:"Round the spine forward and reach the arms ahead to lengthen and release the back.",cues:"Breathe into the back of the ribs."},
 {id:"pigeon",name:"Pigeon Hip Stretch",area:"hips",type:"static",dur:60,bilateral:true,desc:"From hands and knees, bring one shin forward toward the floor and extend the other leg straight back, then fold forward over the front shin.",cues:"Keep the hips square. Breathe into the front glute. Switch sides."},
 {id:"half-pigeon",name:"Half Pigeon Hip Stretch",area:"hips",type:"static",dur:60,bilateral:true,desc:"With the front shin angled across and the back leg extended, stay more upright to ease into the hip.",cues:"Use hands for support. Square the hips. Switch sides."},
 {id:"double-pigeon",name:"Double Pigeon Pose",area:"hips",type:"static",dur:45,bilateral:true,desc:"Seated, stack one shin directly on top of the other so the knees and ankles align, then fold forward.",cues:"Flex both feet to protect the knees. Switch sides."},
@@ -583,19 +575,14 @@ const DEFAULTS=[
 {id:"90-90",name:"90 to 90 Stretch",area:"hips",type:"static",dur:45,bilateral:true,desc:"Seated with both knees bent at 90° — one in front, one to the side — sit tall and hinge over the front shin.",cues:"Sit tall first, then fold. Switch sides."},
 {id:"dynamic-90-90",name:"Dynamic 90 90 Hip Twist",area:"hips",type:"mobility",dur:45,bilateral:false,desc:"Seated, rotate both knees from one 90/90 side to the other, controlling the movement through the middle.",cues:"Drive from the hips. Keep the chest tall."},
 {id:"shin-box-switch",name:"Shin Box Switch",area:"hips",sub:"shin",type:"mobility",dur:40,bilateral:false,desc:"Seated, switch the knees side to side between 90/90 positions, lifting and rotating from the hips.",cues:"Control the movement. Use the glutes to drive."},
-{id:"seated-groin",name:"Seated Groin Stretch",area:"hips",type:"static",dur:40,bilateral:false,desc:"Seated with soles together, gently press the knees toward the floor to stretch the inner thighs.",cues:"Sit tall, hinge from the hips. Gentle pressure on the knees."},
 {id:"frog-rock",name:"Rocking Ankle Stretch",area:"legs",type:"mobility",dur:30,bilateral:true,desc:"Kneeling with one foot forward, rock the front knee forward over the toes to mobilize the ankle.",cues:"Keep the heel down. Rock gently. Switch sides."},
-{id:"fire-log",name:"Double Pigeon Pose (Fire Log)",area:"hips",type:"static",dur:45,bilateral:true,desc:"Seated, stack the shins parallel one over the other and fold forward over them.",cues:"Flex both feet. Ease forward slowly. Switch sides."},
 {id:"pretzel",name:"Pretzel Stretch",area:"hips",type:"static",dur:40,bilateral:true,desc:"Seated with legs crossed and twisted, rotate the torso to deepen a combined hip and spine stretch.",cues:"Sit tall, rotate gently. Switch sides."},
 {id:"standing-hamstring",name:"Standing Hamstring Stretch",area:"legs",sub:"hamstring",type:"static",dur:40,bilateral:false,desc:"Standing, hinge forward from the hips with soft knees and let the upper body hang toward the floor.",cues:"Hinge from the hips, keep the back long. Soft knees."},
 {id:"standing-high-hamstring",name:"Standing High Leg Bent Knee Hamstring Stretch",area:"legs",sub:"hamstring",type:"static",dur:40,bilateral:true,desc:"Place one heel on a raised surface with a slight bend in the knee and hinge forward over it.",cues:"Lead with the chest. Switch sides."},
 {id:"seated-single-hamstring",name:"Seated Single Leg Hamstring Stretch",area:"legs",sub:"hamstring",type:"static",dur:40,bilateral:true,desc:"Seated with one leg extended and the other bent in, fold forward over the straight leg.",cues:"Reach the chest toward the toes. Switch sides."},
 {id:"leg-up-hamstring",name:"Leg Up Hamstring Stretch",area:"legs",sub:"hamstring",type:"static",dur:45,bilateral:true,desc:"On the back, raise one straight leg and draw it gently toward you, holding behind the thigh or calf.",cues:"Keep the leg as straight as comfortable. Switch sides."},
-{id:"basic-toe-touch",name:"Basic Toe Touch",area:"legs",type:"static",dur:40,bilateral:false,desc:"Standing with feet together, fold forward and reach toward the toes.",cues:"Soft knees if needed. Let the head hang."},
-{id:"standing-quad",name:"Standing Quadriceps Stretch",area:"legs",sub:"quad",type:"balance",dur:30,bilateral:true,desc:"Standing on one leg, bend the other knee and hold the foot behind you, drawing the heel toward the glute.",cues:"Keep the knees together. Tuck the pelvis. Switch sides."},
 {id:"standing-balance-quad",name:"Standing Balance Quadriceps Stretch",area:"legs",sub:"quad",type:"balance",dur:30,bilateral:true,desc:"Balancing on one leg, hold the opposite foot behind you and gently press the hips forward.",cues:"Use a wall if needed. Knees stay close. Switch sides."},
 {id:"lying-quad",name:"Quadriceps Lying Stretch",area:"legs",sub:"quad",type:"static",dur:35,bilateral:true,desc:"Lying on one side, hold the top foot behind you and ease the heel toward the glute.",cues:"Keep the knees stacked, hips forward. Switch sides."},
-{id:"seated-quad",name:"Seated Quadriceps Stretch",area:"legs",sub:"quad",type:"static",dur:35,bilateral:true,desc:"Seated with one leg folded back beside the hip, gently lean back to stretch the front of the thigh.",cues:"Go only as far as the knee allows. Switch sides."},
 {id:"all-fours-quad",name:"All Fours Quad Stretch",area:"legs",sub:"quad",type:"static",dur:35,bilateral:true,desc:"On hands and knees, lift one foot toward the glute and reach back to hold it.",cues:"Keep the hips level. Switch sides."},
 {id:"calf-wall",name:"Calf Stretch with Hands Against Wall",area:"legs",sub:"calf",type:"static",dur:30,bilateral:true,desc:"Hands on a wall, step one foot back and press the heel down with the leg straight.",cues:"Straight back leg targets the upper calf. Switch sides."},
 {id:"calves-stretch",name:"Calves Stretch",area:"legs",sub:"calf",type:"static",dur:30,bilateral:true,desc:"Step one foot back and press the heel into the floor, keeping the leg straight.",cues:"Lean forward gently. Heel stays down. Switch sides."},
@@ -606,7 +593,6 @@ const DEFAULTS=[
 {id:"seated-straight-calf",name:"Seated Straight Leg Calf Stretch",area:"legs",sub:"calf",type:"static",dur:30,bilateral:true,desc:"Seated with the leg straight, pull the toes back toward the shin to stretch the calf.",cues:"Gentle steady pull. Switch sides."},
 {id:"adductor",name:"Adductor Stretch",area:"legs",sub:"adductor",type:"static",dur:35,bilateral:true,desc:"In a wide stance, shift the weight to one bent knee while the other leg stays straight, stretching the inner thigh.",cues:"Sink toward the bent side. Switch sides."},
 {id:"side-lunge-adductor",name:"Side Lunge Adductor Stretch",area:"legs",sub:"adductor",type:"static",dur:35,bilateral:true,desc:"Step wide and bend one knee, keeping the other leg straight, to stretch the inner thigh.",cues:"Keep the straight leg’s foot flat. Switch sides."},
-{id:"sitting-wide-adductor",name:"Sitting Wide Leg Adductor Stretch",area:"legs",sub:"adductor",type:"static",dur:45,bilateral:false,desc:"Seated with the legs wide, hinge forward from the hips to stretch the inner thighs.",cues:"Lead with the chest, spine long."},
 {id:"spread-leg-fold",name:"Spread Leg Forward Fold Upavista Konasana",area:"legs",type:"static",dur:50,bilateral:false,desc:"Seated with legs wide, walk the hands forward and fold the torso toward the floor.",cues:"Hinge from the hips. Patience — let it open."},
 {id:"wide-leg-fold",name:"Wide Legged Forward Bend Prasarita Padottanasana",area:"legs",type:"static",dur:45,bilateral:false,desc:"Standing with feet wide, fold forward from the hips and let the crown of the head drop toward the floor.",cues:"Hinge from the hips, soften the knees if needed."},
 {id:"stand-spread-fold",name:"Stand Spread Leg Forward Fold",area:"legs",type:"static",dur:45,bilateral:false,desc:"Wide stance, hinge forward and let the upper body hang between the legs.",cues:"Keep the weight in the balls of the feet slightly."},
@@ -617,8 +603,6 @@ const DEFAULTS=[
 {id:"feet-ankles-rotation",name:"Feet and Ankles Rotation Stretch",area:"legs",type:"mobility",dur:25,bilateral:true,desc:"Rotate the foot at the ankle through its full range in both directions.",cues:"Slow and controlled. Switch sides."},
 {id:"seated-ankle",name:"Seated Ankle Stretch",area:"legs",type:"mobility",dur:25,bilateral:true,desc:"Seated, point and flex the foot and circle the ankle to mobilize the joint.",cues:"Move through the full range gently. Switch sides."},
 {id:"standing-side-bend",name:"Standing Side Bend",area:"core",type:"static",dur:30,bilateral:true,desc:"Standing tall, reach one arm overhead and lean to the opposite side.",cues:"Lengthen up and over — don’t collapse forward. Switch sides."},
-{id:"standing-lateral",name:"Standing Lateral Stretch",area:"core",type:"static",dur:30,bilateral:true,desc:"Reach overhead and bend to the side, opening the side body.",cues:"Keep both feet grounded. Switch sides."},
-{id:"standing-side-stretch",name:"Standing Side Stretch",area:"core",type:"static",dur:30,bilateral:true,desc:"Clasp the hands overhead and lean to one side to stretch the waist and ribs.",cues:"Reach tall first, then over. Switch sides."},
 {id:"abdominal-stretch",name:"Abdominal Stretch",area:"core",type:"static",dur:30,bilateral:false,desc:"From lying face down, press up gently to lengthen and stretch the front of the abdomen (like a gentle cobra).",cues:"Keep the hips down. Easy backbend."},
 {id:"rotating-stomach",name:"Rotating Stomach Stretch",area:"core",type:"static",dur:35,bilateral:true,desc:"From a gentle prone press-up, rotate the torso to look over one shoulder, deepening the oblique stretch.",cues:"Slow rotation. Hips stay grounded. Switch sides."},
 {id:"seated-rotation",name:"Seated Rotation Stretch",area:"core",type:"static",dur:35,bilateral:true,desc:"Seated tall, rotate the torso to one side using the hands for gentle leverage.",cues:"Rotate from the waist up. Switch sides."},
@@ -682,7 +666,6 @@ const DEFAULTS=[
 {id:"seated-spinal-twist",name:"Ardha Matsyendrasana Yoga Pose",area:"back",type:"static",dur:35,bilateral:true,desc:"Seated with one leg crossed over the other, twist the torso toward the top knee, using the arm for leverage.",cues:"Lengthen up on the inhale, twist on the exhale. Switch sides."},
 {id:"standing-iliotibial",name:"Standing Iliotibial Stretch",area:"legs",type:"static",dur:30,bilateral:true,desc:"Cross one leg behind the other and lean to the side of the back leg, pushing the hip out.",cues:"Feel it down the outer leg and hip. Switch sides."},
 {id:"standing-leg-cross-abductor",name:"Standing Leg Cross Abductor Stretch",area:"legs",type:"static",dur:30,bilateral:true,desc:"Cross the ankles and fold forward over the straight legs to stretch the outer hips and IT band.",cues:"Soft knees, let the head hang. Switch sides."},
-{id:"standing-outer-hip",name:"Standing Outer Hip Stretch",area:"hips",type:"static",dur:35,bilateral:true,desc:"Cross one leg behind and shift the hip out to the side to stretch the outer hip.",cues:"Push the hip away from the midline. Switch sides."},
 {id:"standing-knee-to-chest",name:"Standing Knee to Chest Stretch",area:"hips",sub:"chest",type:"balance",dur:30,bilateral:true,desc:"Standing, draw one knee up toward the chest and hold it with the hands.",cues:"Stand tall, don’t round the back. Switch sides."},
 {id:"lying-hip-flexor",name:"Lying Hip Flexor Stretch",area:"hips",sub:"hip flexor",type:"static",dur:40,bilateral:true,desc:"Lying near the edge of a surface, let one leg hang down while hugging the other knee to the chest.",cues:"Let the hanging leg relax down. Switch sides."},
 {id:"kneeling-iliopsoas",name:"Kneeling Iliopsoas Stretch",area:"hips",sub:"hip flexor",type:"static",dur:40,bilateral:true,desc:"In a half-kneel, tuck the pelvis and shift forward to stretch the deep hip flexor.",cues:"Squeeze the back glute. Stay tall. Switch sides."},
@@ -706,28 +689,20 @@ const DEFAULTS=[
 {id:"full-squat-mobility",name:"Full Squat Mobility",area:"hips",type:"mobility",dur:45,bilateral:false,desc:"Hold a deep squat and gently shift and rotate to open the hips and ankles.",cues:"Explore the bottom position. Stay relaxed."},
 {id:"squat-mobility-twist",name:"Squat Mobility Twist",area:"hips",type:"mobility",dur:35,bilateral:true,desc:"In a deep squat, reach one arm up and rotate the chest open toward the ceiling.",cues:"Use the elbow to press the knee open. Switch sides."},
 {id:"twisted-leg-lunge",name:"Twisted Leg Lunge Pose",area:"hips",type:"static",dur:40,bilateral:true,desc:"From a low lunge, rotate the torso toward the front leg and reach the arm up.",cues:"Open the chest toward the bent knee. Switch sides."},
-{id:"split-sprinter-lunge",name:"Split Sprinter Low Lunge",area:"hips",type:"static",dur:40,bilateral:true,desc:"A deep low lunge with the hips sunk and the back leg extended long.",cues:"Drop the hips low. Lengthen the back leg. Switch sides."},
 {id:"lunge-stretch",name:"Lunge Stretch",area:"hips",type:"static",dur:40,bilateral:true,desc:"Step into a lunge and sink the hips to stretch the hip flexor of the back leg.",cues:"Press the hips forward and down. Switch sides."},
 {id:"front-hamstring",name:"Front Hamstring Stretch",area:"legs",sub:"hamstring",type:"static",dur:40,bilateral:true,desc:"Place one heel forward with the leg straight and hinge forward over it.",cues:"Keep the back flat, hinge from the hips. Switch sides."},
 {id:"single-straight-leg",name:"Single Straight Leg Stretch",area:"legs",type:"dynamic",dur:30,bilateral:true,desc:"On the back, draw one straight leg toward you while the other stays extended.",cues:"Alternate with control. Switch sides."},
 {id:"double-leg-stretch",name:"Double Leg Stretch",area:"core",type:"dynamic",dur:30,bilateral:false,desc:"On the back, extend the arms and legs away then circle them back in, a Pilates core move.",cues:"Keep the lower back grounded. Controlled."},
-{id:"standing-hamstrings-back",name:"Standing Hamstrings and Back Stretch",area:"legs",sub:"hamstring",type:"static",dur:45,bilateral:false,desc:"Fold forward from standing to stretch both the hamstrings and the back.",cues:"Soft knees. Let the spine release."},
 {id:"standing-half-bend",name:"Standing Half Bend",area:"core",type:"static",dur:30,bilateral:true,desc:"Standing, bend to one side reaching the arm overhead.",cues:"Lengthen up and over. Switch sides."},
-{id:"standing-lateral-side",name:"Standing Lateral Side Stretch",area:"core",type:"static",dur:30,bilateral:true,desc:"Reach one arm overhead and lean to the opposite side to open the waist.",cues:"Keep both feet planted. Switch sides."},
-{id:"standing-two-side-bend",name:"Standing Two Side Bend",area:"core",type:"dynamic",dur:30,bilateral:true,desc:"Alternate side bends left and right with the arms overhead.",cues:"Flow side to side with control."},
 {id:"spine-twist",name:"Spine Twist",area:"back",type:"static",dur:35,bilateral:true,desc:"Seated tall with legs extended, rotate the torso to one side reaching the arms wide.",cues:"Grow tall, then rotate. Switch sides."},
-{id:"spine-stretch-forward",name:"Spine Stretch Forward",area:"back",type:"static",dur:35,bilateral:false,desc:"Seated with legs extended, round forward reaching toward the feet, articulating the spine.",cues:"Roll down one vertebra at a time."},
 {id:"side-twist",name:"Side Twist",area:"core",type:"mobility",dur:30,bilateral:true,desc:"Rotate the torso to each side to mobilize the trunk and spine.",cues:"Rotate from the waist. Switch sides."},
 {id:"big-turn-back",name:"Standing Reach Up Back Rotation Stretch",area:"back",type:"mobility",dur:35,bilateral:true,desc:"Reach one arm up and across, rotating the upper back to open the chest.",cues:"Follow the hand with the eyes. Switch sides."},
-{id:"kneeling-lat",name:"Kneeling Lat Stretch",area:"back",type:"static",dur:40,bilateral:false,desc:"Kneel and walk the hands forward, sinking the chest toward the floor to stretch the lats.",cues:"Reach long, melt the chest down."},
 {id:"one-arm-lat",name:"One Arm Lat Stretch",area:"back",type:"static",dur:35,bilateral:true,desc:"Hold onto a support and lean away to stretch one side of the lats.",cues:"Sink the hip away from the hold. Switch sides."},
 {id:"side-lat",name:"Side Lat Stretch",area:"back",type:"static",dur:35,bilateral:true,desc:"Reach one arm overhead and lean to the side to stretch the lat and side body.",cues:"Lengthen through the fingertips. Switch sides."},
 {id:"kneeling-chest",name:"Kneeling Chest Stretch",area:"shoulders",sub:"chest",type:"static",dur:40,bilateral:false,desc:"Kneel and place the hands on a raised surface, then sink the chest down between the arms.",cues:"Let the chest melt toward the floor."},
 {id:"seated-chest-clam",name:"Seated Chest Clam",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Seated, clasp the hands behind the head and draw the elbows back to open the chest.",cues:"Squeeze the shoulder blades, lift the chest."},
 {id:"chest-front-shoulder",name:"Chest and Front of Shoulder Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:true,desc:"Place the arm against a wall and rotate the body away to open the chest and front shoulder.",cues:"Forearm flat, turn the chest open. Switch sides."},
-{id:"behind-head-chest",name:"Behind Head Chest Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Clasp the hands behind the head and draw the elbows wide and back to open the chest.",cues:"Lift the chest, widen the elbows."},
 {id:"back-pec",name:"Back Pec Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:true,desc:"Reach one arm back and against a surface, turning away to stretch the pec.",cues:"Rotate the chest away from the arm. Switch sides."},
-{id:"standing-one-arm-chest",name:"Standing One Arm Chest Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:true,desc:"Place one hand on a wall behind you and turn the body away to stretch the chest.",cues:"Feel the stretch across the front of the shoulder. Switch sides."},
 {id:"reverse-chest",name:"Reverse Chest Stretch",area:"shoulders",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Clasp the hands behind the back and lift the arms to open the chest and shoulders.",cues:"Roll the shoulders back and down."},
 {id:"superman-chest",name:"Superman Chest Stretch",area:"back",sub:"chest",type:"static",dur:30,bilateral:false,desc:"Lying face down, reach the arms forward and lift them with the chest off the floor.",cues:"Lengthen through the fingertips. Lift gently."},
 {id:"external-shoulder-rotation",name:"External Shoulder Rotation Stretch",area:"shoulders",type:"static",dur:30,bilateral:true,desc:"With the elbow bent at the side, rotate the forearm outward to stretch the rotator cuff.",cues:"Keep the elbow tucked in. Switch sides."},
@@ -737,11 +712,7 @@ const DEFAULTS=[
 {id:"elbow-flexor",name:"Elbow Flexor Stretch",area:"shoulders",type:"static",dur:25,bilateral:true,desc:"Extend the arm straight and gently press the palm back to stretch the biceps and forearm.",cues:"Keep the elbow straight. Switch sides."},
 {id:"forearm-pronator",name:"Forearm Pronator Stretch",area:"shoulders",type:"static",dur:25,bilateral:true,desc:"With the arm extended, rotate the forearm and gently ease the stretch into the pronator.",cues:"Gentle rotation. Switch sides."},
 {id:"seated-sky-look",name:"Seated Sky Look",area:"neck",type:"static",dur:25,bilateral:false,desc:"Seated, gently tip the head back to look up, stretching the front of the neck.",cues:"Small range. Stop if pinching. Open the throat gently."},
-{id:"ceiling-look",name:"Ceiling Look Stretch",area:"neck",type:"static",dur:25,bilateral:false,desc:"Gently look up toward the ceiling to stretch the front of the neck.",cues:"Ease back slowly. Keep the shoulders relaxed."},
-{id:"forward-flexion-neck",name:"Forward Flexion Neck Stretch",area:"neck",type:"static",dur:30,bilateral:false,desc:"Drop the chin toward the chest to stretch the back of the neck.",cues:"Let the head be heavy. Breathe."},
 {id:"front-back-neck",name:"Front and Back Neck Stretch",area:"neck",type:"mobility",dur:30,bilateral:false,desc:"Gently nod the head forward and back through a comfortable range.",cues:"Slow and controlled, small range."},
-{id:"side-push-neck",name:"Side Push Neck Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Tilt the head to one side and use the hand for gentle added pressure.",cues:"Very light pressure. Switch sides."},
-{id:"seated-neck-tap",name:"Seated Neck Tap",area:"neck",type:"static",dur:30,bilateral:true,desc:"Seated, rest the hand over the head and gently guide the ear toward the shoulder.",cues:"Let the arm be heavy, no pulling. Switch sides."},
 {id:"kneeling-wrist-flexor",name:"Kneeling Wrist Flexor Stretch",area:"shoulders",type:"static",dur:25,bilateral:false,desc:"On hands and knees, turn the hands so the fingers point back toward the knees and gently lean back.",cues:"Ease back slowly — wrists are delicate."},
 {id:"forearm-wall-slide",name:"Forearm Wall Slide",area:"shoulders",type:"mobility",dur:35,bilateral:false,desc:"Place the forearms on a wall and slide them up overhead while keeping contact.",cues:"Keep the forearms on the wall as you reach up."},
 {id:"serratus-wall-slide",name:"Serratus Wall Slide",area:"shoulders",type:"mobility",dur:35,bilateral:false,desc:"Forearms on a wall, press into the wall and slide up, reaching tall through the shoulder blades.",cues:"Push into the wall and reach long."},
@@ -752,7 +723,6 @@ const DEFAULTS=[
 {id:"standing-balance-hip-rotation",name:"Standing Balance Hip Rotation",area:"hips",type:"mobility",dur:35,bilateral:true,desc:"Balancing on one leg, lift the other knee and rotate the hip open and closed.",cues:"Controlled circles. Use support if needed. Switch sides."},
 {id:"standing-balance-outer-hip",name:"Standing Balance Outer Hip Stretch",area:"hips",type:"balance",dur:35,bilateral:true,desc:"Balancing on one leg, draw the other ankle across and press to open the outer hip.",cues:"Steady gaze. Switch sides."},
 {id:"kneeling-sartorius",name:"Kneeling Sartorius Stretch",area:"hips",type:"static",dur:40,bilateral:true,desc:"In a half-kneel, rotate and extend the hip to target the sartorius along the front-inner thigh.",cues:"Subtle stretch — move slowly. Switch sides."},
-{id:"kneeling-neck",name:"Kneeling Neck Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Kneeling, tilt the head to the side for a gentle neck stretch.",cues:"Relax the shoulders down. Switch sides."},
 {id:"plantar-flexion",name:"Plantar Flexion Stretch",area:"legs",type:"static",dur:25,bilateral:true,desc:"Point the foot and gently press the top of the foot toward the floor to stretch the front of the ankle.",cues:"Gentle pressure. Switch sides."},
 {id:"peroneals",name:"Peroneals Stretch",area:"legs",type:"static",dur:30,bilateral:true,desc:"Turn the sole of the foot inward and gently stretch the outer lower leg.",cues:"Easy range. Switch sides."},
 {id:"posterior-tibialis",name:"Posterior Tibialis Stretch",area:"legs",sub:"shin",type:"static",dur:30,bilateral:true,desc:"Turn the sole outward gently to stretch the inner lower leg.",cues:"Subtle stretch. Switch sides."},
@@ -813,21 +783,13 @@ let libArea='',imgTarget=null,dragSrc=null;
 let tInterval=null,tIdx=0,tLeft=0,tPhase='stretch',sideSwitched=false,sessionStretches=[];
 
 function save(){
-  let imagesFailed=false;
   try{
     localStorage.setItem('sx-lib',JSON.stringify(lib));
     localStorage.setItem('sx-routines',JSON.stringify(routines));
     localStorage.setItem('sx-session',JSON.stringify(session));
     localStorage.setItem('sx-history',JSON.stringify(history));
-  }catch(e){
-    if(!window._storageWarned){window._storageWarned=true;
-      alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) and remove some uploaded photos to free space.');}
-    return;
-  }
-  try{
     localStorage.setItem('sx-imgs',JSON.stringify(userImgs));
   }catch(e){
-    imagesFailed=true;
     if(!window._storageWarned){window._storageWarned=true;
       alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) and remove some uploaded photos to free space.');}
   }
@@ -1083,7 +1045,6 @@ function showSettingsSub(name){
   if(name==='appearance')renderThemeGrid();
   if(name==='sounds')renderSoundPickers();
   if(name==='voice')renderVoicePicker();
-  if(name==='data')renderStorageUsage();
 }
 function closeSettingsSub(){
   document.querySelectorAll('.settings-sub').forEach(s=>s.classList.remove('on'));
@@ -1941,12 +1902,8 @@ function addToSessionModal(){
     lib.filter(s=>selected.has(s.id)).forEach(s=>session.push({...s,qid:uid()}));
     save();closeModal();renderSetup();
   };
-  window._createForSession=()=>{
-    addStretchModal({onSave:s=>{session.push({...s,qid:uid()});save();renderSetup();addToSessionModal();}});
-  };
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:12px">Add stretches</p>
     <input class="fi" id="m-add-search" placeholder="Search stretches…" oninput="_addSearch()" style="margin-bottom:12px">
-    <button class="btn" style="width:100%;margin-bottom:12px" onclick="_createForSession()">+ create new stretch</button>
     <div id="m-add-list" style="max-height:50vh;overflow-y:auto"></div>
     <div style="display:flex;gap:8px;margin-top:14px;align-items:center">
       <span id="m-add-count" style="flex:1;font-size:12px;color:var(--muted);font-family:'JetBrains Mono',monospace"></span>
@@ -1955,8 +1912,7 @@ function addToSessionModal(){
     </div>`);
   renderList();
 }
-function addStretchModal(opts){
-  window._addStretchOpts=opts||null;
+function addStretchModal(){
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:14px">Custom stretch</p>
     <label class="fl">Name</label><input class="fi" id="m-cn" placeholder="e.g. Side bend">
     <label class="fl">Category</label><select class="fi" id="m-ca">${CATS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select>
@@ -1965,17 +1921,13 @@ function addStretchModal(opts){
     <label class="fl">Duration (seconds)</label><input class="fi" type="number" id="m-cdur" value="30" min="5" max="300">
     <div style="display:flex;align-items:center;gap:10px;margin:8px 0"><label class="tog"><input type="checkbox" id="m-cbil"><span class="tog-sl"></span></label><div style="font-size:13px">Bilateral (switch-side alert)</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label class="tog"><input type="checkbox" id="m-cpnf"><span class="tog-sl"></span></label><div style="font-size:13px">PNF (tense/relax)</div></div>
-    <div style="display:flex;gap:8px"><button class="btn ac" style="flex:1" onclick="confirmAddStretch()">${opts&&opts.onSave?'Add':'Add to library'}</button><button class="btn" onclick="closeModal()">Cancel</button></div>`);
+    <div style="display:flex;gap:8px"><button class="btn ac" style="flex:1" onclick="confirmAddStretch()">Add to library</button><button class="btn" onclick="closeModal()">Cancel</button></div>`);
   setTimeout(()=>document.getElementById('m-cn')?.focus(),80);
 }
 function confirmAddStretch(){
   const n=document.getElementById('m-cn')?.value.trim();if(!n)return;
-  const s={id:slugId(n),name:n,area:document.getElementById('m-ca').value,cat:document.getElementById('m-ca').value,desc:document.getElementById('m-cd').value.trim(),cues:document.getElementById('m-cc').value.trim(),dur:+document.getElementById('m-cdur').value||30,bilateral:document.getElementById('m-cbil').checked,pnf:document.getElementById('m-cpnf').checked};
-  lib.push(s);
-  save();
-  const opts=window._addStretchOpts;window._addStretchOpts=null;
-  if(opts&&opts.onSave){closeModal();opts.onSave(s);}
-  else{closeModal();renderLib();}
+  lib.push({id:slugId(n),name:n,area:document.getElementById('m-ca').value,cat:document.getElementById('m-ca').value,desc:document.getElementById('m-cd').value.trim(),cues:document.getElementById('m-cc').value.trim(),dur:+document.getElementById('m-cdur').value||30,bilateral:document.getElementById('m-cbil').checked,pnf:document.getElementById('m-cpnf').checked});
+  save();closeModal();renderLib();
 }
 
 /* ── EXPORT / IMPORT ── */
@@ -2001,71 +1953,6 @@ function onImportFile(e){
     }catch(err){alert('Could not read that file.');}
   };
   r.readAsText(f);e.target.value='';
-}
-
-/* ── STORAGE USAGE ── */
-function fmtBytes(n){
-  if(n<1024)return n+' B';
-  if(n<1024*1024)return (n/1024).toFixed(1)+' KB';
-  return (n/(1024*1024)).toFixed(2)+' MB';
-}
-// Most mobile browsers cap localStorage around 5MB per origin; some allow up to 10MB.
-// We estimate against 5MB since that's the safer, more common ceiling.
-const STORAGE_QUOTA_ESTIMATE=5*1024*1024;
-function renderStorageUsage(){
-  const card=document.getElementById('storage-usage-card');
-  if(!card)return;
-  const keys={lib:'sx-lib',routines:'sx-routines',session:'sx-session',history:'sx-history',images:'sx-imgs',settings:'sx-settings'};
-  const sizes={};let total=0;
-  Object.entries(keys).forEach(([label,key])=>{
-    const raw=localStorage.getItem(key)||'';
-    const bytes=new Blob([raw]).size;
-    sizes[label]=bytes;total+=bytes;
-  });
-  const pct=Math.min(100,(total/STORAGE_QUOTA_ESTIMATE)*100);
-  const segColors={images:'#ed3426',lib:'#3a5fd9',routines:'#3a8fd9',history:'#3ad9b0',session:'#888',settings:'#555'};
-  const bar=Object.entries(sizes).filter(([,b])=>b>0).map(([label,b])=>
-    `<div style="background:${segColors[label]};width:${(b/total*100).toFixed(2)}%" title="${label}: ${fmtBytes(b)}"></div>`).join('');
-
-  // per-photo sizes, sorted largest first
-  const photoEntries=Object.entries(userImgs).map(([id,data])=>{
-    const stretch=lib.find(s=>s.id===id);
-    const bytes=new Blob([data]).size;
-    return {id,name:stretch?stretch.name:id,bytes,data};
-  }).sort((a,b)=>b.bytes-a.bytes);
-  const photoTotal=photoEntries.reduce((a,p)=>a+p.bytes,0);
-
-  card.innerHTML=`
-    <div class="card">
-      <div style="padding:14px 16px 4px">
-        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
-          <span style="font-size:13px;color:var(--muted)">~${fmtBytes(total)} used</span>
-          <span style="font-size:11px;color:var(--muted)">est. ${pct.toFixed(0)}% of typical 5MB limit</span>
-        </div>
-        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.06)">${bar}</div>
-        ${pct>80?'<div style="margin-top:10px;font-size:12px;color:#ed3426">Close to the limit — remove some uploaded photos below.</div>':''}
-      </div>
-    </div>
-    ${photoEntries.length?`
-    <div style="padding:14px 16px 6px"><span style="font-size:12px;color:var(--muted)">Uploaded photos · ${fmtBytes(photoTotal)} total</span></div>
-    <div class="card" style="padding:4px 0">
-      ${photoEntries.map(p=>`
-        <div class="srow" style="align-items:center">
-          <img src="${p.data}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;margin-right:10px;flex-shrink:0">
-          <div style="flex:1;min-width:0">
-            <div class="slbl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
-            <div class="ssub">${fmtBytes(p.bytes)}</div>
-          </div>
-          <button class="btn sm red" onclick="removeStoragePhoto('${p.id}')">remove</button>
-        </div>`).join('')}
-    </div>` : `<div style="padding:8px 16px"><span style="font-size:12px;color:var(--muted)">No uploaded photos — nothing extra to clear here.</span></div>`}
-  `;
-}
-function removeStoragePhoto(id){
-  delete userImgs[id];
-  save();
-  renderStorageUsage();
-  renderLib();
 }
 
 /* ── MODAL ── */
@@ -2130,13 +2017,33 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
     routines=routines.filter(r=>!dropOld.has(r.name));
     localStorage.setItem('sx-routines-renamed-v1','1');
   }
+  // one-time migration: apply library audit to already-saved routine copies
+  if(!localStorage.getItem('sx-audit-v1')){
+    const swap={'standing-quad':'hero','seated-quad':'hero','seated-groin':'butterfly','sitting-wide-adductor':'seated-single-hamstring'};
+    const dropFromRoutine=new Set(['side-push-neck','chin-to-chest','fire-log']);
+    routines.forEach(r=>{
+      // swap removed stretches for their survivor (copy fields from the library entry)
+      r.stretches=r.stretches.map(st=>{
+        if(swap[st.id]){
+          const ns=lib.find(l=>l.id===swap[st.id]);
+          if(ns)return {...ns,qid:st.qid,dur:st.dur,pnf:st.pnf};
+        }
+        return st;
+      });
+      // drop slots whose stretch was removed with no replacement
+      r.stretches=r.stretches.filter(st=>!dropFromRoutine.has(st.id));
+      // de-dup any accidental immediate duplicate (e.g. butterfly twice)
+      r.stretches=r.stretches.filter((st,i,a)=>i===0||st.id!==a[i-1].id);
+    });
+    localStorage.setItem('sx-audit-v1','1');
+  }
   // one-time seed: GROOVE/BOUNCE routines (added once; won't re-add if later deleted)
   if(!localStorage.getItem('sx-seeded-groovebounce')){
     const mk=(ids)=>ids.map(id=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid()}:null;}).filter(Boolean);
     const seedRoutines=[
-      {id:uid(),name:'Groove X',stretches:mk(['deep-squat','standing-quad','seated-single-hamstring','calf-wall','frog','cow-face','scorpion'])},
+      {id:uid(),name:'Groove X',stretches:mk(['deep-squat','hero','seated-single-hamstring','calf-wall','frog','cow-face','scorpion'])},
       {id:uid(),name:'Bounce X',stretches:mk(['chest-front-shoulder','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
-      {id:uid(),name:'Groove Y',stretches:mk(['deep-squat','seated-groin','figure-four','butterfly','calf-wall','cow-face','scorpion'])},
+      {id:uid(),name:'Groove Y',stretches:mk(['deep-squat','pigeon','figure-four','butterfly','calf-wall','cow-face','scorpion'])},
       {id:uid(),name:'Bounce Y',stretches:mk(['chest-front-shoulder','puppy-pose','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
     ];
     routines=routines.concat(seedRoutines);
@@ -2157,7 +2064,7 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
     const mkD2=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
     const yinLong=[
       {id:uid(),name:'Yin Extended A',stretches:mkD2([['child-pose',120],['pigeon',150],['frog',150],['seated-single-hamstring',120],['sphinx',90],['supine-twist',90],['legs-up-wall',180],['corpse',120]])},
-      {id:uid(),name:'Yin Extended B',stretches:mkD2([['puppy-pose',120],['butterfly',150],['sitting-wide-adductor',150],['double-pigeon',120],['thread-the-needle',90],['seated-back-twist',90],['legs-up-wall',180],['corpse',120]])},
+      {id:uid(),name:'Yin Extended B',stretches:mkD2([['puppy-pose',120],['butterfly',150],['seated-single-hamstring',120],['double-pigeon',120],['thread-the-needle',90],['seated-back-twist',90],['legs-up-wall',180],['corpse',120]])},
     ];
     routines=routines.concat(yinLong);
     localStorage.setItem('sx-seeded-yinlong','1');
@@ -2167,10 +2074,10 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
   if(!localStorage.getItem('sx-seeded-office-v2')){
     const mkD4=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
     const officeV2=[
-      {id:uid(),name:'Post A',stretches:mkD4([['deep-squat',30],['kneeling-hip-flexor',40],['standing-hamstring',35],['standing-quad',35],['pigeon',35]])},
+      {id:uid(),name:'Post A',stretches:mkD4([['deep-squat',30],['kneeling-hip-flexor',40],['standing-hamstring',35],['hero',35],['pigeon',35]])},
       {id:uid(),name:'Post B',stretches:mkD4([['couch-stretch',40],['calf-wall',30],['revolved-triangle',30],['lying-glute',35]])},
-      {id:uid(),name:'Firm A',stretches:mkD4([['chin-tuck',20],['chest-front-shoulder',40],['sphinx',60],['cow-face',30],['side-push-neck',25]])},
-      {id:uid(),name:'Firm B',stretches:mkD4([['chin-to-chest',25],['reverse-chest',40],['scapula-retraction',30],['seated-shoulder-flexor-depressor-retractor',40],['rear-deltoid',30]])},
+      {id:uid(),name:'Firm A',stretches:mkD4([['chin-tuck',20],['chest-front-shoulder',40],['sphinx',60],['cow-face',30]])},
+      {id:uid(),name:'Firm B',stretches:mkD4([['reverse-chest',40],['scapula-retraction',30],['seated-shoulder-flexor-depressor-retractor',40],['rear-deltoid',30]])},
     ];
     routines=routines.concat(officeV2);
     localStorage.setItem('sx-seeded-office-v2','1');
