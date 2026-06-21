@@ -1311,19 +1311,46 @@ function renderSetup(){
     <div class="qi2" draggable="true" ondragstart="ds(event,${i})" ondragover="dov(event)" ondrop="dp(event,${i})">
       <div class="qi2-top">
         <span class="dh">⠿</span>
-        ${imgTag(s.id)}
-        <div class="ri"><div class="rn">${s.name}</div><div class="rm"><span class="pill">${catOf(s)}</span>${s.bilateral?BILAT:''}</div></div>
+        <span onclick="zoomImage('${s.id}')" style="cursor:zoom-in">${imgTag(s.id,{zoom:true})}</span>
+        <div class="ri" onclick="infoPopup('${s.id}')" style="cursor:pointer"><div class="rn">${s.name}</div><div class="rm"><span class="pill">${catOf(s)}</span>${s.bilateral?BILAT:''}</div></div>
         <button class="xbtn" onclick="removeSetup(${i})">✕</button>
       </div>
       <div class="qi2-bot">
         <div class="stepper"><button onclick="adjDur(${i},-5)">−</button><span id="sd-${i}">${s.dur}s</span><button onclick="adjDur(${i},5)">+</button></div>
         <button class="pnf-chip ${s.pnf?'on':''}" onclick="togglePnf(${i})" title="Tense/relax method">PNF ${s.pnf?'on':'off'}</button>
+        <button class="pnf-chip" onclick="replaceSetup(${i})" title="Swap for another stretch">⇄ replace</button>
       </div>
     </div>`).join('');
 }
 function togglePnf(i){session[i].pnf=!session[i].pnf;save();renderSetup();}
 function adjDur(i,d){session[i].dur=Math.max(5,Math.min(300,session[i].dur+d));document.getElementById('sd-'+i).textContent=session[i].dur+'s';save();}
 function removeSetup(i){session.splice(i,1);save();renderSetup();}
+function replaceSetup(i){
+  const cur=session[i];
+  function renderList(){
+    const q=(document.getElementById('m-rep-search')?.value||'').toLowerCase();
+    const filtered=lib.filter(s=>(!q||s.name.toLowerCase().includes(q)||(catOf(s).toLowerCase()).includes(q)||(s.sub||'').includes(q)));
+    document.getElementById('m-rep-list').innerHTML=filtered.map(s=>`
+      <div class="build-stretch" onclick="doReplaceSetup(${i},'${s.id}')">
+        <span onclick="event.stopPropagation();zoomImage('${s.id}')" style="cursor:zoom-in">${imgTag(s.id,{zoom:true})}</span>
+        <div class="ri"><div class="rn">${s.name}</div><div class="rm"><span class="pill">${catOf(s)}</span><span>${s.dur}s</span>${s.bilateral?BILAT:''}</div></div>
+      </div>`).join('')||'<div class="empty">No stretches found.</div>';
+  }
+  window._repSearch=renderList;
+  window.doReplaceSetup=(idx,id)=>{
+    const ns=lib.find(l=>l.id===id);if(!ns)return;
+    const prev=session[idx];
+    // keep this slot's customised timing/PNF, adopt the new stretch otherwise
+    session[idx]={...ns,qid:prev.qid,dur:prev.dur,pnf:prev.pnf};
+    save();closeModal();renderSetup();
+  };
+  openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:2px">Replace stretch</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:12px">Swapping out <b>${cur.name}</b> — keeps its ${cur.dur}s timing.</p>
+    <input class="fi" id="m-rep-search" placeholder="Search stretches…" oninput="_repSearch()" style="margin-bottom:12px">
+    <div id="m-rep-list" style="max-height:50vh;overflow-y:auto"></div>
+    <button class="btn ghost" style="width:100%;margin-top:12px" onclick="closeModal()">Cancel</button>`);
+  renderList();
+}
 function ds(e,i){dragSrc=i;e.dataTransfer.effectAllowed='move';}
 function dov(e){e.preventDefault();}
 function dp(e,i){e.preventDefault();if(dragSrc===null||dragSrc===i)return;const m=session.splice(dragSrc,1)[0];session.splice(i,0,m);dragSrc=null;save();renderSetup();}
@@ -1705,10 +1732,12 @@ function buildRoutineModal(){
 function uploadImg(id){imgTarget=id;document.getElementById('img-input').click();}
 function onImgFile(e){
   const f=e.target.files[0];if(!f||!imgTarget)return;
+  const id=imgTarget;
   const r=new FileReader();
-  r.onload=ev=>{userImgs[imgTarget]=ev.target.result;save();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===imgTarget)renderTimer();renderLib();if(document.getElementById('pg-setup').classList.contains('on'))renderSetup();imgTarget=null;};
+  r.onload=ev=>{userImgs[id]=ev.target.result;save();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();renderLib();if(document.getElementById('pg-setup').classList.contains('on'))renderSetup();if(document.getElementById('e-name'))editStretchModal(id);imgTarget=null;};
   r.readAsDataURL(f);e.target.value='';
 }
+function clearUserImg(id){delete userImgs[id];save();renderLib();if(document.getElementById('pg-setup')?.classList.contains('on'))renderSetup();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();editStretchModal(id);}
 function imgOptions(id){
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:14px">Change photo</p>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -1798,12 +1827,17 @@ function editStretchModal(id){
     <label class="fl">Default duration (seconds)</label><input class="fi" type="number" id="e-dur" value="${s.dur}" min="5" max="300">
     <div style="display:flex;align-items:center;gap:10px;margin:8px 0"><label class="tog"><input type="checkbox" id="e-bil" ${s.bilateral?'checked':''}><span class="tog-sl"></span></label><div style="font-size:13px">Bilateral (switch-side alert)</div></div>
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px"><label class="tog"><input type="checkbox" id="e-pnf" ${s.pnf?'checked':''}><span class="tog-sl"></span></label><div style="font-size:13px">PNF (tense/relax)</div></div>
-    <label class="fl">Photo filename (for GitHub)</label>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+    <label class="fl">Photo</label>
+    <div style="display:flex;gap:8px;margin-bottom:10px">
+      <button class="btn sm" style="flex:1" onclick="uploadImg('${id}')">${userImgs[id]?'↺ replace photo':'⬆ upload photo'}</button>
+      ${userImgs[id]?`<button class="btn sm" onclick="zoomImage('${id}')">view</button><button class="btn sm red" onclick="clearUserImg('${id}')">remove</button>`:`<button class="btn sm" onclick="zoomImage('${id}')">view</button>`}
+    </div>
+    <label class="fl">Or use a GitHub photo file</label>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
       <code style="flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:'DM Mono',monospace;font-size:13px;color:var(--accent);overflow:hidden;text-overflow:ellipsis" id="e-fname">photos/${fname}</code>
       <button class="btn sm" onclick="copyFname('${fname}')">copy</button>
     </div>
-    <p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:14px">Name your image file <b>${fname}</b> (or .png/.webp) and put it in the <b>photos/</b> folder in your repo. This filename never changes, even if you rename the stretch.</p>
+    <p style="font-size:11px;color:var(--muted);line-height:1.5;margin-bottom:14px">An uploaded photo is stored on this device only. The <b>${fname}</b> route loads a shared image from the <b>photos/</b> folder in your repo, and the filename never changes even if you rename the stretch.</p>
     <div style="display:flex;gap:8px"><button class="btn ac" style="flex:1" onclick="confirmEditStretch('${id}')">Save</button><button class="btn red" onclick="deleteStretch('${id}')">Delete</button></div>
     <button class="btn ghost" style="width:100%;margin-top:8px" onclick="closeModal()">Cancel</button>`);
   setTimeout(()=>document.getElementById('e-name')?.focus(),80);
@@ -1988,14 +2022,36 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
     localStorage.setItem('sx-patched-squathold-v2','1');
     localStorage.setItem('sx-patched-squathold','1'); // supersedes the old patch
   }
+  // one-time migration: rename routines to the new scheme + drop the old office pair
+  if(!localStorage.getItem('sx-routines-renamed-v1')){
+    const rename={
+      'GROOVE X — Squat Day':'Groove X',
+      'BOUNCE X':'Bounce X',
+      'GROOVE Y — Hip Thrust Day':'Groove Y',
+      'BOUNCE Y':'Bounce Y',
+      'Groove Yin':'Groove Yin Min',
+      'Bounce Yin':'Bounce Yin Min',
+      'Yin A — Deep Hips & Hamstrings':'Yin Extended A',
+      'Yin B — Spine & Adductors':'Yin Extended B',
+      'Office · Lower A':'Post A',
+      'Office · Lower B':'Post B',
+      'Office · Upper A — Hunchback Fix':'Firm A',
+      'Office · Upper B — Hunchback Fix':'Firm B',
+    };
+    routines.forEach(r=>{if(rename[r.name])r.name=rename[r.name];});
+    // remove the superseded old office pair
+    const dropOld=new Set(['Office · Lower Body','Office · Upper Body & Wrists']);
+    routines=routines.filter(r=>!dropOld.has(r.name));
+    localStorage.setItem('sx-routines-renamed-v1','1');
+  }
   // one-time seed: GROOVE/BOUNCE routines (added once; won't re-add if later deleted)
   if(!localStorage.getItem('sx-seeded-groovebounce')){
     const mk=(ids)=>ids.map(id=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid()}:null;}).filter(Boolean);
     const seedRoutines=[
-      {id:uid(),name:'GROOVE X — Squat Day',stretches:mk(['deep-squat','standing-quad','seated-single-hamstring','calf-wall','frog','cow-face','scorpion'])},
-      {id:uid(),name:'BOUNCE X',stretches:mk(['chest-front-shoulder','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
-      {id:uid(),name:'GROOVE Y — Hip Thrust Day',stretches:mk(['deep-squat','seated-groin','figure-four','butterfly','calf-wall','cow-face','scorpion'])},
-      {id:uid(),name:'BOUNCE Y',stretches:mk(['chest-front-shoulder','puppy-pose','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
+      {id:uid(),name:'Groove X',stretches:mk(['deep-squat','standing-quad','seated-single-hamstring','calf-wall','frog','cow-face','scorpion'])},
+      {id:uid(),name:'Bounce X',stretches:mk(['chest-front-shoulder','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
+      {id:uid(),name:'Groove Y',stretches:mk(['deep-squat','seated-groin','figure-four','butterfly','calf-wall','cow-face','scorpion'])},
+      {id:uid(),name:'Bounce Y',stretches:mk(['chest-front-shoulder','puppy-pose','dead-hang','overhead-triceps','wrist-flexor','reverse-prayer','seated-back-twist','sphinx'])},
     ];
     routines=routines.concat(seedRoutines);
     localStorage.setItem('sx-seeded-groovebounce','1');
@@ -2004,8 +2060,8 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
   if(!localStorage.getItem('sx-seeded-yinshort')){
     const mkD=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
     const yinShort=[
-      {id:uid(),name:'Groove Yin',stretches:mkD([['butterfly',90],['pigeon',75],['happy-baby',60],['seated-single-hamstring',60],['lying-quad',60],['sphinx',75],['supine-twist',60]])},
-      {id:uid(),name:'Bounce Yin',stretches:mkD([['child-pose',90],['puppy-pose',75],['sphinx',75],['reverse-prayer',60],['cow-face',60],['seated-back-twist',60]])},
+      {id:uid(),name:'Groove Yin Min',stretches:mkD([['butterfly',90],['pigeon',75],['happy-baby',60],['seated-single-hamstring',60],['lying-quad',60],['sphinx',75],['supine-twist',60]])},
+      {id:uid(),name:'Bounce Yin Min',stretches:mkD([['child-pose',90],['puppy-pose',75],['sphinx',75],['reverse-prayer',60],['cow-face',60],['seated-back-twist',60]])},
     ];
     routines=routines.concat(yinShort);
     localStorage.setItem('sx-seeded-yinshort','1');
@@ -2014,30 +2070,21 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
   if(!localStorage.getItem('sx-seeded-yinlong')){
     const mkD2=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
     const yinLong=[
-      {id:uid(),name:'Yin A — Deep Hips & Hamstrings',stretches:mkD2([['child-pose',120],['pigeon',150],['frog',150],['seated-single-hamstring',120],['sphinx',90],['supine-twist',90],['legs-up-wall',180],['corpse',120]])},
-      {id:uid(),name:'Yin B — Spine & Adductors',stretches:mkD2([['puppy-pose',120],['butterfly',150],['sitting-wide-adductor',150],['double-pigeon',120],['thread-the-needle',90],['seated-back-twist',90],['legs-up-wall',180],['corpse',120]])},
+      {id:uid(),name:'Yin Extended A',stretches:mkD2([['child-pose',120],['pigeon',150],['frog',150],['seated-single-hamstring',120],['sphinx',90],['supine-twist',90],['legs-up-wall',180],['corpse',120]])},
+      {id:uid(),name:'Yin Extended B',stretches:mkD2([['puppy-pose',120],['butterfly',150],['sitting-wide-adductor',150],['double-pigeon',120],['thread-the-needle',90],['seated-back-twist',90],['legs-up-wall',180],['corpse',120]])},
     ];
     routines=routines.concat(yinLong);
     localStorage.setItem('sx-seeded-yinlong','1');
   }
-  // one-time seed: office routines (added once; won't re-add if later deleted)
-  if(!localStorage.getItem('sx-seeded-office')){
-    const mkD3=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
-    const office=[
-      {id:uid(),name:'Office · Lower Body',stretches:mkD3([['deep-squat',30],['standing-hip-flexor',45],['standing-hamstring',40],['standing-quad',40],['standing-figure-four',40]])},
-      {id:uid(),name:'Office · Upper Body & Wrists',stretches:mkD3([['chin-tuck',20],['chest-front-shoulder',40],['cross-over-shoulder',35],['overhead-triceps',30],['wrist-flexor',20],['wrist-extensor',20]])},
-    ];
-    routines=routines.concat(office);
-    localStorage.setItem('sx-seeded-office','1');
-  }
+  // (old "Office · Lower/Upper Body" seed removed — superseded by Post/Firm below)
   // one-time seed: office routines v2 — lower/upper, two versions each, hunchback-focused (added once; won't re-add if later deleted)
   if(!localStorage.getItem('sx-seeded-office-v2')){
     const mkD4=(specs)=>specs.map(([id,dur])=>{const s=lib.find(l=>l.id===id);return s?{...s,qid:uid(),dur}:null;}).filter(Boolean);
     const officeV2=[
-      {id:uid(),name:'Office · Lower A',stretches:mkD4([['deep-squat',30],['kneeling-hip-flexor',40],['standing-hamstring',35],['standing-quad',35],['pigeon',35]])},
-      {id:uid(),name:'Office · Lower B',stretches:mkD4([['couch-stretch',40],['calf-wall',30],['revolved-triangle',30],['lying-glute',35]])},
-      {id:uid(),name:'Office · Upper A — Hunchback Fix',stretches:mkD4([['chin-tuck',20],['chest-front-shoulder',40],['sphinx',60],['cow-face',30],['side-push-neck',25]])},
-      {id:uid(),name:'Office · Upper B — Hunchback Fix',stretches:mkD4([['chin-to-chest',25],['reverse-chest',40],['scapula-retraction',30],['seated-shoulder-flexor-depressor-retractor',40],['rear-deltoid',30]])},
+      {id:uid(),name:'Post A',stretches:mkD4([['deep-squat',30],['kneeling-hip-flexor',40],['standing-hamstring',35],['standing-quad',35],['pigeon',35]])},
+      {id:uid(),name:'Post B',stretches:mkD4([['couch-stretch',40],['calf-wall',30],['revolved-triangle',30],['lying-glute',35]])},
+      {id:uid(),name:'Firm A',stretches:mkD4([['chin-tuck',20],['chest-front-shoulder',40],['sphinx',60],['cow-face',30],['side-push-neck',25]])},
+      {id:uid(),name:'Firm B',stretches:mkD4([['chin-to-chest',25],['reverse-chest',40],['scapula-retraction',30],['seated-shoulder-flexor-depressor-retractor',40],['rear-deltoid',30]])},
     ];
     routines=routines.concat(officeV2);
     localStorage.setItem('sx-seeded-office-v2','1');
