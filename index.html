@@ -472,6 +472,9 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
         <button class="btn sm" onclick="document.getElementById('import-input').click()">Import</button></div>
     </div>
     <div style="padding:8px 16px 0"><span style="font-size:11px;color:var(--muted)">All data is stored on this device. Export regularly to keep a backup.</span></div>
+
+    <span class="sec-lbl" style="margin-top:18px">Storage</span>
+    <div id="storage-usage-card"></div>
   </div>
 </div>
 
@@ -810,13 +813,21 @@ let libArea='',imgTarget=null,dragSrc=null;
 let tInterval=null,tIdx=0,tLeft=0,tPhase='stretch',sideSwitched=false,sessionStretches=[];
 
 function save(){
+  let imagesFailed=false;
   try{
     localStorage.setItem('sx-lib',JSON.stringify(lib));
     localStorage.setItem('sx-routines',JSON.stringify(routines));
     localStorage.setItem('sx-session',JSON.stringify(session));
     localStorage.setItem('sx-history',JSON.stringify(history));
+  }catch(e){
+    if(!window._storageWarned){window._storageWarned=true;
+      alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) and remove some uploaded photos to free space.');}
+    return;
+  }
+  try{
     localStorage.setItem('sx-imgs',JSON.stringify(userImgs));
   }catch(e){
+    imagesFailed=true;
     if(!window._storageWarned){window._storageWarned=true;
       alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) and remove some uploaded photos to free space.');}
   }
@@ -1072,6 +1083,7 @@ function showSettingsSub(name){
   if(name==='appearance')renderThemeGrid();
   if(name==='sounds')renderSoundPickers();
   if(name==='voice')renderVoicePicker();
+  if(name==='data')renderStorageUsage();
 }
 function closeSettingsSub(){
   document.querySelectorAll('.settings-sub').forEach(s=>s.classList.remove('on'));
@@ -1989,6 +2001,71 @@ function onImportFile(e){
     }catch(err){alert('Could not read that file.');}
   };
   r.readAsText(f);e.target.value='';
+}
+
+/* ── STORAGE USAGE ── */
+function fmtBytes(n){
+  if(n<1024)return n+' B';
+  if(n<1024*1024)return (n/1024).toFixed(1)+' KB';
+  return (n/(1024*1024)).toFixed(2)+' MB';
+}
+// Most mobile browsers cap localStorage around 5MB per origin; some allow up to 10MB.
+// We estimate against 5MB since that's the safer, more common ceiling.
+const STORAGE_QUOTA_ESTIMATE=5*1024*1024;
+function renderStorageUsage(){
+  const card=document.getElementById('storage-usage-card');
+  if(!card)return;
+  const keys={lib:'sx-lib',routines:'sx-routines',session:'sx-session',history:'sx-history',images:'sx-imgs',settings:'sx-settings'};
+  const sizes={};let total=0;
+  Object.entries(keys).forEach(([label,key])=>{
+    const raw=localStorage.getItem(key)||'';
+    const bytes=new Blob([raw]).size;
+    sizes[label]=bytes;total+=bytes;
+  });
+  const pct=Math.min(100,(total/STORAGE_QUOTA_ESTIMATE)*100);
+  const segColors={images:'#ed3426',lib:'#3a5fd9',routines:'#3a8fd9',history:'#3ad9b0',session:'#888',settings:'#555'};
+  const bar=Object.entries(sizes).filter(([,b])=>b>0).map(([label,b])=>
+    `<div style="background:${segColors[label]};width:${(b/total*100).toFixed(2)}%" title="${label}: ${fmtBytes(b)}"></div>`).join('');
+
+  // per-photo sizes, sorted largest first
+  const photoEntries=Object.entries(userImgs).map(([id,data])=>{
+    const stretch=lib.find(s=>s.id===id);
+    const bytes=new Blob([data]).size;
+    return {id,name:stretch?stretch.name:id,bytes,data};
+  }).sort((a,b)=>b.bytes-a.bytes);
+  const photoTotal=photoEntries.reduce((a,p)=>a+p.bytes,0);
+
+  card.innerHTML=`
+    <div class="card">
+      <div style="padding:14px 16px 4px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px">
+          <span style="font-size:13px;color:var(--muted)">~${fmtBytes(total)} used</span>
+          <span style="font-size:11px;color:var(--muted)">est. ${pct.toFixed(0)}% of typical 5MB limit</span>
+        </div>
+        <div style="display:flex;height:8px;border-radius:4px;overflow:hidden;background:rgba(255,255,255,.06)">${bar}</div>
+        ${pct>80?'<div style="margin-top:10px;font-size:12px;color:#ed3426">Close to the limit — remove some uploaded photos below.</div>':''}
+      </div>
+    </div>
+    ${photoEntries.length?`
+    <div style="padding:14px 16px 6px"><span style="font-size:12px;color:var(--muted)">Uploaded photos · ${fmtBytes(photoTotal)} total</span></div>
+    <div class="card" style="padding:4px 0">
+      ${photoEntries.map(p=>`
+        <div class="srow" style="align-items:center">
+          <img src="${p.data}" style="width:40px;height:40px;border-radius:6px;object-fit:cover;margin-right:10px;flex-shrink:0">
+          <div style="flex:1;min-width:0">
+            <div class="slbl" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${p.name}</div>
+            <div class="ssub">${fmtBytes(p.bytes)}</div>
+          </div>
+          <button class="btn sm red" onclick="removeStoragePhoto('${p.id}')">remove</button>
+        </div>`).join('')}
+    </div>` : `<div style="padding:8px 16px"><span style="font-size:12px;color:var(--muted)">No uploaded photos — nothing extra to clear here.</span></div>`}
+  `;
+}
+function removeStoragePhoto(id){
+  delete userImgs[id];
+  save();
+  renderStorageUsage();
+  renderLib();
 }
 
 /* ── MODAL ── */
