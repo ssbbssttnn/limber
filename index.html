@@ -128,13 +128,17 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 .search-input:focus{outline:none;border-color:var(--accent)}
 .search-input::placeholder{color:var(--muted)}
 
-.chips{display:flex;gap:6px;padding:0 16px 12px;overflow-x:auto;scrollbar-width:none}
-.chips::-webkit-scrollbar{display:none}
+.chips{display:block;padding:0 16px 12px}
+.chiprow{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:8px}
+.chiprow::-webkit-scrollbar{display:none}
+.filt-label{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin:2px 0 6px;display:flex;align-items:center;gap:8px}
+.filt-label .clr{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;text-decoration:underline}
 .chip{
   flex-shrink:0;font-family:'JetBrains Mono',monospace;font-weight:400;font-size:12px;padding:6px 13px;border-radius:var(--r);cursor:pointer;white-space:nowrap;
   background:var(--surface);border:1px solid var(--border);color:var(--muted);text-transform:lowercase;letter-spacing:0.03em;transition:all 0.12s;
 }
 .chip.on{background:linear-gradient(180deg,var(--accent2),var(--accent));color:var(--accent-text);border-color:var(--accent);box-shadow:0 2px 8px -3px var(--accent)}
+.chip.kind.on{background:var(--surface2);color:var(--text);border-color:var(--muted);box-shadow:none}
 
 /* setup rows */
 .qi2{padding:14px 16px;border-bottom:1px solid var(--border)}
@@ -281,6 +285,18 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 
 /* misc */
 .type-pill{font-family:'JetBrains Mono',monospace;font-weight:400;font-size:9px;letter-spacing:0.06em;text-transform:uppercase;padding:1px 6px;border-radius:2px;background:var(--accent-dim);color:var(--accent);display:inline-block;border:1px solid var(--accent-dim)}
+.part-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:4px}
+.part-tag{font-family:'JetBrains Mono',monospace;font-size:11px;padding:6px 10px;border-radius:var(--r);cursor:pointer;background:var(--surface);border:1px solid var(--border);color:var(--muted);transition:.12s}
+.part-tag.on{background:linear-gradient(180deg,var(--accent2),var(--accent));color:var(--accent-text);border-color:var(--accent)}
+.name-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid var(--border)}
+.name-row .name-txt{flex:1;font-size:14px;word-break:break-word}
+.name-row.active .name-txt{font-weight:600}
+.name-pick{background:none;border:none;color:var(--accent);font-size:16px;cursor:pointer;padding:0;width:22px;flex-shrink:0}
+.name-pick:disabled{color:var(--accent);cursor:default}
+.name-badge{font-family:'JetBrains Mono',monospace;font-size:8px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-dim);border-radius:3px;padding:2px 5px}
+.name-x{background:none;border:none;color:var(--muted);cursor:pointer;font-size:13px;padding:4px 6px;flex-shrink:0}
+.name-add{display:flex;gap:8px;margin-top:8px}
+.name-add .fi{margin:0}
 .bilat{display:inline-flex;align-items:center;justify-content:center;height:16px;padding:0 4px;border-radius:2px;border:1px solid var(--border);background:var(--surface2);color:var(--accent);vertical-align:middle}
 .bilat svg{display:block;width:13px;height:13px}
 .img-zoom-overlay{display:none;position:fixed;inset:0;background:rgba(5,8,20,0.85);z-index:300;align-items:center;justify-content:center;padding:20px}
@@ -355,7 +371,7 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
       <button class="btn sm ac" onclick="addStretchModal()">+ custom</button>
     </div>
   </div>
-  <div class="search-wrap"><input class="search-input" id="lib-search" placeholder="Search 150+ stretches…" oninput="renderLib()"></div>
+  <div class="search-wrap"><input class="search-input" id="lib-search" placeholder="Search stretches, body parts, types…" oninput="renderLib()"></div>
   <div class="chips" id="lib-chips"></div>
   <div id="lib-list" class="card"></div>
 </div>
@@ -506,6 +522,13 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 const CATS=['Neck','Chest','Back','Core','Biceps','Triceps','Forearms','Wrists','Glutes','Hips','Hamstrings','Quads','Calves','Ankles','Twists','Mobility','Dynamic','Balance','Floss','Restorative'];
 const CAT={"neck-side":"Neck","neck-flexor":"Neck","neck-extensor":"Neck","chin-tuck":"Mobility","rotating-neck":"Mobility","neck-circle":"Neck","seated-neck-side":"Neck","seated-sky-look":"Neck","front-back-neck":"Neck","bent-arm-chest":"Chest","above-head-chest":"Chest","humble-warrior":"Chest","fish":"Chest","crab":"Chest","kneeling-chest":"Chest","seated-chest-clam":"Chest","chest-front-shoulder":"Chest","back-pec":"Chest","reverse-chest":"Chest","superman-chest":"Core","cat-pose":"Back","cow-stretch":"Back","cobra":"Back","sphinx":"Back","upward-dog":"Back","puppy-pose":"Back","lying-knee-to-chest":"Back","double-knee-to-chest":"Back","lying-lower-back":"Twists","seated-lower-back":"Back","upper-back":"Back","bow-pose":"Back","camel":"Back","bridge":"Back","wheel":"Back","plow":"Back","one-arm-lat":"Back","side-lat":"Back","dead-hang":"Back","wrist-flexor":"Wrists","wrist-extensor":"Wrists","wrist-circles":"Wrists","kneeling-wrist-flexor":"Wrists","reverse-prayer":"Wrists","finger-extension":"Forearms","finger-flexor":"Forearms","thumb-stretch":"Forearms","forearm-pronator":"Forearms","elbow-flexor":"Biceps","elbows-back":"Biceps","overhead-triceps":"Triceps","triceps-stretch":"Triceps","cow-face":"Triceps","pigeon":"Glutes","half-pigeon":"Glutes","double-pigeon":"Glutes","seated-glute":"Glutes","lying-glute":"Glutes","seated-piriformis":"Glutes","figure-four":"Glutes","pretzel":"Glutes","standing-knee-to-chest":"Glutes","butterfly":"Hips","frog":"Hips","happy-baby":"Hips","low-lunge":"Hips","high-lunge":"Hips","kneeling-hip-flexor":"Hips","standing-hip-flexor":"Hips","lizard":"Hips","garland":"Hips","90-90":"Hips","adductor":"Hips","side-lunge-adductor":"Hips","runners-stretch":"Hips","warrior-1":"Hips","warrior-2":"Hips","lotus":"Hips","standing-iliotibial":"Hips","standing-leg-cross-abductor":"Hips","lying-hip-flexor":"Hips","kneeling-iliopsoas":"Hips","crossover-kneeling-hip-flexor":"Hips","hip-extension":"Hips","hip-external-rotator":"Hips","seated-hip-external-rotation":"Hips","lying-abductor":"Hips","recumbent-hip":"Hips","side-split":"Hips","lunge-stretch":"Hips","kneeling-sartorius":"Hips","thread-the-needle":"Twists","seated-back-twist":"Twists","supine-twist":"Twists","lying-knee-roll":"Twists","standing-back-rotation":"Twists","kneeling-back-rotation":"Twists","rotating-stomach":"Twists","seated-rotation":"Twists","standing-abs-rotation":"Twists","revolved-triangle":"Twists","revolved-side-angle":"Twists","open-book":"Twists","kneeling-tspine":"Twists","seated-spinal-twist":"Twists","lying-crossover":"Twists","squat-mobility-twist":"Twists","twisted-leg-lunge":"Twists","spine-twist":"Twists","side-twist":"Twists","big-turn-back":"Twists","lying-upper-body-rotation":"Twists","standing-low-body-rotation":"Twists","standing-upper-body-rotation":"Twists","twist-step":"Twists","bent-over-twist":"Twists","standing-wring-towel":"Twists","windshield-wipers":"Twists","windmills":"Twists","scorpion":"Twists","standing-hamstring":"Hamstrings","standing-high-hamstring":"Hamstrings","seated-single-hamstring":"Hamstrings","leg-up-hamstring":"Hamstrings","spread-leg-fold":"Hamstrings","wide-leg-fold":"Hamstrings","stand-spread-fold":"Hamstrings","downward-dog":"Hamstrings","standing-forward-bend":"Hamstrings","hands-to-feet":"Hamstrings","pyramid":"Hamstrings","front-hamstring":"Hamstrings","standing-balance-quad":"Quads","lying-quad":"Quads","all-fours-quad":"Quads","couch-stretch":"Quads","chair-pose":"Quads","hero":"Quads","calf-wall":"Calves","calves-stretch":"Calves","standing-gastroc":"Calves","lunging-calf":"Calves","standing-achilles":"Calves","seated-calf":"Calves","seated-straight-calf":"Calves","heel-press":"Calves","standing-toe-up-calf":"Calves","lying-calf":"Calves","frog-rock":"Ankles","standing-shin":"Ankles","standing-tibialis":"Ankles","ankle-circles":"Ankles","feet-ankles-rotation":"Ankles","seated-ankle":"Ankles","plantar-flexion":"Ankles","peroneals":"Ankles","posterior-tibialis":"Ankles","standing-side-bend":"Core","abdominal-stretch":"Core","triangle":"Core","extended-side-angle":"Core","reverse-warrior":"Core","gate-pose":"Core","boat-pose":"Core","crescent-moon":"Core","standing-half-bend":"Core","floss-sciatic":"Floss","floss-median":"Floss","floss-ulnar":"Floss","floss-radial":"Floss","floss-femoral":"Floss","child-pose":"Restorative","legs-up-wall":"Restorative","corpse":"Restorative","crocodile":"Restorative","animal-resting":"Restorative","arm-circles":"Dynamic","standing-arms-circling":"Dynamic","leg-swings-front":"Dynamic","leg-swings-side":"Dynamic","worlds-greatest":"Dynamic","toy-soldier":"Dynamic","front-leg-kick":"Dynamic","inchworm":"Dynamic","rocker-open-legs":"Dynamic","side-kick":"Dynamic","leg-to-side":"Dynamic","single-straight-leg":"Dynamic","double-leg-stretch":"Dynamic","overhead-clap":"Dynamic","rollover":"Dynamic","half-sun-salutation":"Dynamic","standing-hip-openers":"Dynamic","elephant-walks":"Dynamic","butterfly-flaps":"Dynamic","rocking-frog":"Dynamic","cross-over-shoulder":"Mobility","reaching-up-shoulder":"Mobility","rear-deltoid":"Mobility","arm-up-rotator":"Mobility","reverse-shoulder":"Mobility","shoulder-circle":"Mobility","arm-crossover":"Mobility","cat-cow":"Mobility","child-to-cobra":"Mobility","deep-squat":"Mobility","dynamic-90-90":"Mobility","shin-box-switch":"Mobility","hip-circles":"Mobility","scapula-retraction":"Mobility","scapula-elevation":"Mobility","pelvic-tilt":"Mobility","standing-pelvic-tilt":"Mobility","cossack-squat":"Mobility","thoracic-bridge":"Mobility","flexion-extension-hip":"Mobility","half-seated-leg-circle":"Mobility","side-lying-leg-circle":"Mobility","lying-single-leg-circle":"Mobility","potty-squat":"Mobility","full-squat-mobility":"Mobility","external-shoulder-rotation":"Mobility","internal-shoulder-rotation":"Mobility","rotator-cuff":"Mobility","elbow-out-rotator":"Mobility","forearm-wall-slide":"Mobility","serratus-wall-slide":"Mobility","prayer-squat":"Mobility","dolphin":"Mobility","mountain-pose":"Mobility","lying-shoulder-sweep":"Mobility","standing-back-extension-flexion":"Mobility","seated-shoulder-flexor-depressor-retractor":"Mobility","scapular-pushups":"Mobility","bent-over-pendulum":"Mobility","warrior-3":"Balance","tree-pose":"Balance","eagle-pose":"Balance","dancer":"Balance","half-moon":"Balance","hawaiian-squat":"Balance","standing-figure-four":"Balance","standing-balance-outer-hip":"Balance","standing-balance-hip-rotation":"Balance"};
 function catOf(s){if(s.cat)return s.cat;if(CAT[s.id])return CAT[s.id];const t=(s.type||'').toLowerCase();if(t==='dynamic')return'Dynamic';if(t==='mobility')return'Mobility';if(t==='restorative')return'Restorative';if(t==='balance')return'Balance';return({neck:'Neck',chest:'Chest',back:'Back',hips:'Hips',legs:'Hamstrings',core:'Core',shoulders:'Mobility',glide:'Floss'})[s.area]||'Mobility';}
+// ── Body-part (multi) + Type/"kind" (single) classification ──
+const PARTS=['Neck','Shoulders','Chest','Upper back','Lower back','Arms','Wrists/forearms','Core','Glutes','Hips','Hamstrings','Quads','Adductors','Calves','Ankles','Full body'];
+const KINDS=['Static hold','Mobility drill','Dynamic warm-up','Strengthening','Nerve floss','Restorative'];
+const DERIVED_TAGS={"neck-side":{"parts":["Neck"],"kind":"Static hold"},"neck-flexor":{"parts":["Neck"],"kind":"Static hold"},"neck-extensor":{"parts":["Neck"],"kind":"Static hold"},"chin-tuck":{"parts":["Neck"],"kind":"Mobility drill"},"rotating-neck":{"parts":["Neck"],"kind":"Mobility drill"},"neck-circle":{"parts":["Neck"],"kind":"Mobility drill"},"seated-neck-side":{"parts":["Neck"],"kind":"Static hold"},"cross-over-shoulder":{"parts":["Shoulders"],"kind":"Static hold"},"overhead-triceps":{"parts":["Arms"],"kind":"Static hold"},"triceps-stretch":{"parts":["Arms"],"kind":"Static hold"},"bent-arm-chest":{"parts":["Chest"],"kind":"Static hold"},"reaching-up-shoulder":{"parts":["Shoulders"],"kind":"Static hold"},"rear-deltoid":{"parts":["Shoulders"],"kind":"Static hold"},"arm-up-rotator":{"parts":["Shoulders"],"kind":"Static hold"},"elbows-back":{"parts":["Arms"],"kind":"Static hold"},"reverse-shoulder":{"parts":["Shoulders"],"kind":"Static hold"},"above-head-chest":{"parts":["Chest"],"kind":"Static hold"},"shoulder-circle":{"parts":["Shoulders"],"kind":"Mobility drill"},"arm-crossover":{"parts":[],"kind":"Static hold"},"wrist-flexor":{"parts":["Wrists/forearms"],"kind":"Static hold"},"wrist-extensor":{"parts":["Wrists/forearms"],"kind":"Static hold"},"wrist-circles":{"parts":["Wrists/forearms"],"kind":"Mobility drill"},"finger-extension":{"parts":["Wrists/forearms"],"kind":"Static hold"},"finger-flexor":{"parts":["Wrists/forearms"],"kind":"Static hold"},"thumb-stretch":{"parts":["Wrists/forearms"],"kind":"Static hold"},"cat-cow":{"parts":["Lower back"],"kind":"Mobility drill"},"cat-pose":{"parts":["Lower back"],"kind":"Static hold"},"cow-stretch":{"parts":["Lower back"],"kind":"Static hold"},"child-pose":{"parts":["Lower back"],"kind":"Restorative"},"thread-the-needle":{"parts":[],"kind":"Static hold"},"cobra":{"parts":["Lower back"],"kind":"Static hold"},"sphinx":{"parts":["Lower back"],"kind":"Static hold"},"upward-dog":{"parts":[],"kind":"Static hold"},"puppy-pose":{"parts":[],"kind":"Static hold"},"seated-back-twist":{"parts":["Upper back"],"kind":"Static hold"},"supine-twist":{"parts":["Upper back"],"kind":"Static hold"},"lying-knee-to-chest":{"parts":["Chest"],"kind":"Static hold"},"double-knee-to-chest":{"parts":[],"kind":"Static hold"},"lying-lower-back":{"parts":["Lower back"],"kind":"Static hold"},"lying-knee-roll":{"parts":[],"kind":"Static hold"},"seated-lower-back":{"parts":["Lower back"],"kind":"Static hold"},"standing-back-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"upper-back":{"parts":[],"kind":"Static hold"},"child-to-cobra":{"parts":["Lower back"],"kind":"Mobility drill"},"kneeling-back-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"pigeon":{"parts":["Glutes"],"kind":"Static hold"},"half-pigeon":{"parts":["Glutes"],"kind":"Static hold"},"double-pigeon":{"parts":["Glutes"],"kind":"Static hold"},"butterfly":{"parts":["Adductors","Hips"],"kind":"Static hold"},"butterfly-flaps":{"parts":["Adductors","Hips"],"kind":"Dynamic warm-up"},"frog":{"parts":["Adductors","Hips"],"kind":"Static hold"},"rocking-frog":{"parts":["Adductors","Hips"],"kind":"Dynamic warm-up"},"happy-baby":{"parts":[],"kind":"Static hold"},"seated-glute":{"parts":["Glutes"],"kind":"Static hold"},"lying-glute":{"parts":["Glutes"],"kind":"Static hold"},"seated-piriformis":{"parts":["Glutes"],"kind":"Static hold"},"figure-four":{"parts":["Glutes"],"kind":""},"low-lunge":{"parts":["Hips"],"kind":"Static hold"},"high-lunge":{"parts":["Hips"],"kind":"Static hold"},"kneeling-hip-flexor":{"parts":["Hips"],"kind":"Static hold"},"standing-hip-flexor":{"parts":["Hips"],"kind":"Static hold"},"couch-stretch":{"parts":["Quads"],"kind":"Static hold"},"lizard":{"parts":[],"kind":"Static hold"},"garland":{"parts":[],"kind":"Static hold"},"deep-squat":{"parts":[],"kind":"Mobility drill"},"90-90":{"parts":[],"kind":"Static hold"},"dynamic-90-90":{"parts":["Upper back"],"kind":"Mobility drill"},"shin-box-switch":{"parts":["Ankles"],"kind":"Mobility drill"},"frog-rock":{"parts":["Ankles"],"kind":"Mobility drill"},"pretzel":{"parts":["Glutes"],"kind":"Static hold"},"standing-hamstring":{"parts":["Hamstrings"],"kind":"Static hold"},"standing-high-hamstring":{"parts":["Hamstrings"],"kind":"Static hold"},"seated-single-hamstring":{"parts":["Hamstrings"],"kind":"Static hold"},"leg-up-hamstring":{"parts":["Hamstrings"],"kind":"Static hold"},"standing-balance-quad":{"parts":["Quads"],"kind":""},"lying-quad":{"parts":["Quads"],"kind":"Static hold"},"all-fours-quad":{"parts":["Quads"],"kind":"Static hold"},"calf-wall":{"parts":["Calves"],"kind":"Static hold"},"calves-stretch":{"parts":["Calves"],"kind":"Static hold"},"standing-gastroc":{"parts":["Calves"],"kind":"Static hold"},"lunging-calf":{"parts":["Calves"],"kind":"Static hold"},"standing-achilles":{"parts":["Calves"],"kind":"Static hold"},"seated-calf":{"parts":["Calves"],"kind":"Static hold"},"seated-straight-calf":{"parts":["Calves"],"kind":"Static hold"},"adductor":{"parts":["Adductors","Hips"],"kind":"Static hold"},"side-lunge-adductor":{"parts":["Hips","Adductors"],"kind":"Static hold"},"spread-leg-fold":{"parts":["Hamstrings"],"kind":"Static hold"},"wide-leg-fold":{"parts":["Hamstrings"],"kind":"Static hold"},"stand-spread-fold":{"parts":["Hamstrings"],"kind":"Static hold"},"runners-stretch":{"parts":[],"kind":"Static hold"},"standing-shin":{"parts":["Ankles"],"kind":"Static hold"},"standing-tibialis":{"parts":["Ankles"],"kind":"Static hold"},"ankle-circles":{"parts":["Ankles"],"kind":"Mobility drill"},"feet-ankles-rotation":{"parts":["Ankles","Upper back"],"kind":"Mobility drill"},"seated-ankle":{"parts":["Ankles"],"kind":"Mobility drill"},"standing-side-bend":{"parts":["Core"],"kind":"Static hold"},"abdominal-stretch":{"parts":["Core"],"kind":"Static hold"},"rotating-stomach":{"parts":[],"kind":"Static hold"},"seated-rotation":{"parts":["Upper back"],"kind":"Static hold"},"standing-abs-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"downward-dog":{"parts":["Hamstrings"],"kind":"Static hold"},"dolphin":{"parts":[],"kind":"Static hold"},"mountain-pose":{"parts":[],"kind":"Static hold"},"standing-forward-bend":{"parts":["Hamstrings"],"kind":"Static hold"},"hands-to-feet":{"parts":["Hamstrings"],"kind":"Static hold"},"triangle":{"parts":[],"kind":"Static hold"},"revolved-triangle":{"parts":[],"kind":"Static hold"},"extended-side-angle":{"parts":[],"kind":"Static hold"},"revolved-side-angle":{"parts":[],"kind":"Static hold"},"warrior-1":{"parts":[],"kind":"Static hold"},"warrior-2":{"parts":[],"kind":"Static hold"},"reverse-warrior":{"parts":[],"kind":"Static hold"},"humble-warrior":{"parts":["Chest"],"kind":"Static hold"},"pyramid":{"parts":["Hamstrings"],"kind":"Static hold"},"chair-pose":{"parts":["Quads"],"kind":""},"crescent-moon":{"parts":[],"kind":"Static hold"},"gate-pose":{"parts":[],"kind":"Static hold"},"boat-pose":{"parts":["Core"],"kind":""},"bow-pose":{"parts":[],"kind":"Static hold"},"camel":{"parts":["Lower back"],"kind":"Static hold"},"bridge":{"parts":["Lower back"],"kind":"Static hold"},"wheel":{"parts":["Lower back"],"kind":"Static hold"},"fish":{"parts":["Chest"],"kind":"Static hold"},"plow":{"parts":[],"kind":"Static hold"},"legs-up-wall":{"parts":["Full body"],"kind":"Restorative"},"corpse":{"parts":["Full body"],"kind":"Restorative"},"hero":{"parts":["Quads"],"kind":"Static hold"},"lotus":{"parts":[],"kind":"Static hold"},"crab":{"parts":["Chest"],"kind":""},"arm-circles":{"parts":[],"kind":"Dynamic warm-up"},"standing-arms-circling":{"parts":[],"kind":"Dynamic warm-up"},"leg-swings-front":{"parts":[],"kind":"Dynamic warm-up"},"leg-swings-side":{"parts":[],"kind":"Dynamic warm-up"},"hip-circles":{"parts":[],"kind":"Dynamic warm-up"},"worlds-greatest":{"parts":[],"kind":"Dynamic warm-up"},"toy-soldier":{"parts":[],"kind":"Dynamic warm-up"},"front-leg-kick":{"parts":[],"kind":"Dynamic warm-up"},"open-book":{"parts":[],"kind":"Mobility drill"},"scapula-retraction":{"parts":["Shoulders"],"kind":"Mobility drill"},"scapula-elevation":{"parts":["Shoulders"],"kind":"Mobility drill"},"pelvic-tilt":{"parts":["Lower back"],"kind":"Mobility drill"},"standing-pelvic-tilt":{"parts":["Lower back"],"kind":"Mobility drill"},"cossack-squat":{"parts":["Adductors","Hips"],"kind":"Mobility drill"},"inchworm":{"parts":["Core"],"kind":"Dynamic warm-up"},"thoracic-bridge":{"parts":["Upper back","Lower back"],"kind":"Mobility drill"},"kneeling-tspine":{"parts":[],"kind":"Mobility drill"},"floss-sciatic":{"parts":[],"kind":"Nerve floss"},"floss-median":{"parts":[],"kind":"Nerve floss"},"floss-ulnar":{"parts":[],"kind":"Nerve floss"},"floss-radial":{"parts":[],"kind":"Nerve floss"},"floss-femoral":{"parts":[],"kind":"Nerve floss"},"seated-spinal-twist":{"parts":[],"kind":"Static hold"},"standing-iliotibial":{"parts":[],"kind":"Static hold"},"standing-leg-cross-abductor":{"parts":[],"kind":"Static hold"},"standing-knee-to-chest":{"parts":["Glutes","Chest"],"kind":""},"lying-hip-flexor":{"parts":["Hips"],"kind":"Static hold"},"kneeling-iliopsoas":{"parts":["Hips"],"kind":"Static hold"},"crossover-kneeling-hip-flexor":{"parts":["Hips"],"kind":"Static hold"},"flexion-extension-hip":{"parts":[],"kind":"Mobility drill"},"hip-extension":{"parts":[],"kind":"Static hold"},"hip-external-rotator":{"parts":["Shoulders"],"kind":"Static hold"},"seated-hip-external-rotation":{"parts":["Upper back"],"kind":"Static hold"},"rocker-open-legs":{"parts":[],"kind":"Dynamic warm-up"},"half-seated-leg-circle":{"parts":[],"kind":"Mobility drill"},"side-lying-leg-circle":{"parts":[],"kind":"Mobility drill"},"lying-single-leg-circle":{"parts":[],"kind":"Mobility drill"},"side-kick":{"parts":[],"kind":"Dynamic warm-up"},"leg-to-side":{"parts":[],"kind":"Dynamic warm-up"},"lying-abductor":{"parts":[],"kind":"Static hold"},"lying-crossover":{"parts":[],"kind":"Static hold"},"recumbent-hip":{"parts":[],"kind":"Static hold"},"side-split":{"parts":["Adductors","Hips"],"kind":"Static hold"},"potty-squat":{"parts":[],"kind":"Mobility drill"},"full-squat-mobility":{"parts":[],"kind":"Mobility drill"},"squat-mobility-twist":{"parts":["Upper back"],"kind":"Mobility drill"},"twisted-leg-lunge":{"parts":["Hips","Upper back"],"kind":"Static hold"},"lunge-stretch":{"parts":["Hips"],"kind":"Static hold"},"front-hamstring":{"parts":["Hamstrings"],"kind":"Static hold"},"single-straight-leg":{"parts":[],"kind":"Dynamic warm-up"},"double-leg-stretch":{"parts":[],"kind":"Dynamic warm-up"},"standing-half-bend":{"parts":[],"kind":"Static hold"},"spine-twist":{"parts":["Upper back"],"kind":"Static hold"},"side-twist":{"parts":["Upper back"],"kind":"Mobility drill"},"big-turn-back":{"parts":["Upper back"],"kind":"Mobility drill"},"one-arm-lat":{"parts":["Upper back"],"kind":"Static hold"},"side-lat":{"parts":["Upper back"],"kind":"Static hold"},"kneeling-chest":{"parts":["Chest"],"kind":"Static hold"},"seated-chest-clam":{"parts":["Chest"],"kind":"Static hold"},"chest-front-shoulder":{"parts":["Chest","Shoulders"],"kind":"Static hold"},"back-pec":{"parts":["Chest"],"kind":"Static hold"},"reverse-chest":{"parts":["Chest"],"kind":"Static hold"},"superman-chest":{"parts":["Chest"],"kind":"Static hold"},"external-shoulder-rotation":{"parts":["Shoulders","Upper back"],"kind":"Static hold"},"internal-shoulder-rotation":{"parts":["Shoulders","Upper back"],"kind":"Static hold"},"rotator-cuff":{"parts":["Shoulders"],"kind":"Static hold"},"elbow-out-rotator":{"parts":["Arms","Shoulders"],"kind":"Static hold"},"elbow-flexor":{"parts":["Arms"],"kind":"Static hold"},"forearm-pronator":{"parts":["Wrists/forearms"],"kind":"Static hold"},"seated-sky-look":{"parts":["Neck"],"kind":"Static hold"},"front-back-neck":{"parts":["Neck"],"kind":"Mobility drill"},"kneeling-wrist-flexor":{"parts":["Wrists/forearms"],"kind":"Static hold"},"forearm-wall-slide":{"parts":["Wrists/forearms"],"kind":"Mobility drill"},"serratus-wall-slide":{"parts":[],"kind":"Mobility drill"},"prayer-squat":{"parts":[],"kind":"Mobility drill"},"crocodile":{"parts":[],"kind":"Restorative"},"animal-resting":{"parts":[],"kind":"Restorative"},"standing-figure-four":{"parts":["Glutes"],"kind":""},"standing-balance-hip-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"kneeling-sartorius":{"parts":["Hips"],"kind":"Static hold"},"plantar-flexion":{"parts":["Ankles"],"kind":"Static hold"},"peroneals":{"parts":["Ankles"],"kind":"Static hold"},"posterior-tibialis":{"parts":["Ankles"],"kind":"Static hold"},"heel-press":{"parts":["Calves"],"kind":"Static hold"},"standing-toe-up-calf":{"parts":["Calves"],"kind":"Static hold"},"lying-calf":{"parts":["Calves"],"kind":"Static hold"},"lying-upper-body-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"lying-shoulder-sweep":{"parts":["Shoulders"],"kind":"Mobility drill"},"rollover":{"parts":[],"kind":"Dynamic warm-up"},"half-sun-salutation":{"parts":[],"kind":"Dynamic warm-up"},"standing-back-extension-flexion":{"parts":[],"kind":"Mobility drill"},"seated-shoulder-flexor-depressor-retractor":{"parts":["Shoulders"],"kind":"Static hold"},"standing-low-body-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"standing-upper-body-rotation":{"parts":["Upper back"],"kind":"Mobility drill"},"twist-step":{"parts":["Upper back"],"kind":"Dynamic warm-up"},"bent-over-twist":{"parts":["Upper back"],"kind":"Dynamic warm-up"},"standing-wring-towel":{"parts":[],"kind":"Mobility drill"},"overhead-clap":{"parts":[],"kind":"Dynamic warm-up"},"bent-over-pendulum":{"parts":["Shoulders"],"kind":"Mobility drill"},"standing-hip-openers":{"parts":[],"kind":"Dynamic warm-up"},"elephant-walks":{"parts":[],"kind":"Dynamic warm-up"},"windshield-wipers":{"parts":[],"kind":"Mobility drill"},"scapular-pushups":{"parts":["Shoulders"],"kind":"Dynamic warm-up"},"windmills":{"parts":["Upper back","Lower back"],"kind":"Dynamic warm-up"},"scorpion":{"parts":[],"kind":"Dynamic warm-up"},"reverse-prayer":{"parts":["Wrists/forearms"],"kind":"Static hold"},"cow-face":{"parts":["Arms"],"kind":"Static hold"},"dead-hang":{"parts":[],"kind":"Static hold"}};
+function partsOf(s){if(Array.isArray(s.parts))return s.parts;const d=DERIVED_TAGS[s.id];return (d&&d.parts)||[];}
+function kindOf(s){if(s.kind)return s.kind;const d=DERIVED_TAGS[s.id];return (d&&d.kind)||'';}
+function namesOf(s){const arr=Array.isArray(s.names)?s.names.slice():[];if(s.name&&!arr.includes(s.name))arr.unshift(s.name);return arr;}
 const DEFAULTS=[
 {id:"neck-side",name:"Neck Side Stretch",area:"neck",type:"static",dur:30,bilateral:true,desc:"Sitting or standing tall, gently tilt your head so your ear moves toward your shoulder until you feel a stretch along the opposite side of the neck.",cues:"Keep both shoulders down. Let the head be heavy — no forcing."},
 {id:"neck-flexor",name:"Neck Flexor Stretch",area:"neck",type:"static",dur:25,bilateral:false,desc:"Gently tip the head back to look up toward the ceiling, feeling a stretch along the front of the neck.",cues:"Small range. Stop if you feel any pinching at the back of the neck."},
@@ -779,7 +802,7 @@ let history=JSON.parse(localStorage.getItem('sx-history')||'[]');
 let settings=JSON.parse(localStorage.getItem('sx-settings')||'{"prepTime":4,"switchTime":4,"beepOn":true,"sideOn":true,"prepBeepOn":true,"breathOn":true,"voiceOn":false,"volume":0.8,"soundWave":"sine","soundPitch":1,"theme":"blueprint"}');
 if(settings.switchTime==null)settings.switchTime=4;
 
-let libArea='',imgTarget=null,dragSrc=null;
+let libParts=[],libKind='',imgTarget=null,dragSrc=null;
 let tInterval=null,tIdx=0,tLeft=0,tPhase='stretch',sideSwitched=false,sessionStretches=[];
 
 function save(){
@@ -1748,31 +1771,48 @@ function assignBatch(i,id){if(!id)return;userImgs[id]=batchQueue[i];save();rende
 
 /* ── LIBRARY ── */
 function renderLib(){
-  document.getElementById('lib-chips').innerHTML=['',...CATS].map(a=>`<button class="chip ${libArea===a?'on':''}" onclick="setArea('${a}')">${a||'all'}</button>`).join('');
+  // two filter axes: body parts (multi, OR) + kind (single)
+  const partChips=PARTS.map(p=>`<button class="chip ${libParts.includes(p)?'on':''}" onclick="togglePart('${p.replace(/'/g,"\\'")}')">${p}</button>`).join('');
+  const kindChips=['',...KINDS].map(k=>`<button class="chip kind ${libKind===k?'on':''}" onclick="setKind('${k.replace(/'/g,"\\'")}')">${k||'all types'}</button>`).join('');
+  document.getElementById('lib-chips').innerHTML=
+    `<div class="filt-label">Body part${libParts.length?` · ${libParts.length} selected <button class="clr" onclick="clearParts()">clear</button>`:''}</div>
+     <div class="chiprow">${partChips}</div>
+     <div class="filt-label">Type</div>
+     <div class="chiprow">${kindChips}</div>`;
   const q=(document.getElementById('lib-search')?.value||'').toLowerCase();
   const filtered=lib.filter(s=>{
-    const matchQ=!q||s.name.toLowerCase().includes(q)||(catOf(s).toLowerCase()).includes(q)||(s.sub||'').includes(q)||(s.desc||'').toLowerCase().includes(q);
-    return (!libArea||catOf(s)===libArea)&&matchQ;
+    const parts=partsOf(s), kind=kindOf(s);
+    const matchPart=!libParts.length||libParts.some(p=>parts.includes(p)); // OR
+    const matchKind=!libKind||kind===libKind;
+    const matchQ=!q||s.name.toLowerCase().includes(q)||namesOf(s).join(' ').toLowerCase().includes(q)||parts.join(' ').toLowerCase().includes(q)||kind.toLowerCase().includes(q)||(s.desc||'').toLowerCase().includes(q);
+    return matchPart&&matchKind&&matchQ;
   });
   const el=document.getElementById('lib-list');
-  if(!filtered.length){el.innerHTML='<div class="empty">No stretches found.</div>';return;}
+  if(!filtered.length){el.innerHTML='<div class="empty">No stretches match those filters.</div>';return;}
   el.innerHTML=filtered.map(s=>{
-    const cat=catOf(s);
-    const typeLabel=s.type&&s.type!=='static'&&s.type.toLowerCase()!==cat.toLowerCase()?`<span class="type-pill">${s.type}</span>`:'';
+    const parts=partsOf(s), kind=kindOf(s);
+    const partPills=parts.slice(0,2).map(p=>`<span class="pill">${p}</span>`).join('')+(parts.length>2?`<span class="pill">+${parts.length-2}</span>`:'');
+    const kindPill=kind?`<span class="type-pill">${kind}</span>`:'';
     return`<div class="row">
       <div onclick="zoomImage('${s.id}')" style="cursor:pointer">${imgTag(s.id,{zoom:true})}</div>
-      <div class="ri" onclick="infoPopup('${s.id}')" style="cursor:pointer"><div class="rn">${s.name}</div><div class="rm"><span class="pill">${cat}</span>${typeLabel}${s.bilateral?BILAT:''}</div></div>
+      <div class="ri" onclick="infoPopup('${s.id}')" style="cursor:pointer"><div class="rn">${s.name}</div><div class="rm">${partPills||`<span class="pill">${catOf(s)}</span>`}${kindPill}${s.bilateral?BILAT:''}</div></div>
       <button class="btn addbtn" onclick="event.stopPropagation();addToRoutinePrompt('${s.id}')" title="add to a routine">+</button>
     </div>`;
   }).join('');
 }
+function togglePart(p){const i=libParts.indexOf(p);if(i>=0)libParts.splice(i,1);else libParts.push(p);renderLib();}
+function clearParts(){libParts=[];renderLib();}
+function setKind(k){libKind=libKind===k?'':k;renderLib();}
 function infoPopup(id){
   const s=lib.find(l=>l.id===id);if(!s)return;
+  const parts=partsOf(s), kind=kindOf(s), alts=namesOf(s).filter(n=>n!==s.name);
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:2px">${s.name}</p>
-    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${s.type||'static'} · ${catOf(s)}${s.equip?' · '+s.equip:''}</p>
+    <p style="font-size:12px;color:var(--muted);margin-bottom:14px">${kind||s.type||'static'}${parts.length?' · '+parts.join(', '):' · '+catOf(s)}${s.equip?' · '+s.equip:''}</p>
     <div class="info-pop">
       <div class="ip-row"><span class="ip-k">Duration</span><span>${s.dur}s${s.bilateral?' per side':''}</span></div>
-      <div class="ip-row"><span class="ip-k">Type</span><span>${s.type||'static'}</span></div>
+      <div class="ip-row"><span class="ip-k">Type</span><span>${kind||s.type||'static'}</span></div>
+      <div class="ip-row"><span class="ip-k">Body parts</span><span>${parts.length?parts.join(', '):'—'}</span></div>
+      ${alts.length?`<div class="ip-row"><span class="ip-k">Also called</span><span>${alts.join(' · ')}</span></div>`:''}
       <div class="ip-row"><span class="ip-k">Cue</span><span>${s.cues||'—'}</span></div>
       <div class="ip-row"><span class="ip-k">How to</span><span>${s.desc||'—'}</span></div>
     </div>
@@ -1794,7 +1834,11 @@ function editStretchModal(id){
   const fname=id+'.jpg';
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:14px">Edit stretch</p>
     <label class="fl">Name</label><input class="fi" id="e-name" value="${(s.name||'').replace(/"/g,'&quot;')}">
-    <label class="fl">Category</label><select class="fi" id="e-area">${CATS.map(a=>`<option value="${a}" ${catOf(s)===a?'selected':''}>${a}</option>`).join('')}</select>
+    <label class="fl">Body parts <span style="color:var(--muted)">(tap to toggle)</span></label>
+    <div class="part-grid" id="e-parts">${PARTS.map(p=>`<button type="button" class="part-tag ${partsOf(s).includes(p)?'on':''}" data-part="${p}" onclick="this.classList.toggle('on')">${p}</button>`).join('')}</div>
+    <label class="fl">Type</label><select class="fi" id="e-kind"><option value="">— none —</option>${KINDS.map(k=>`<option value="${k}" ${kindOf(s)===k?'selected':''}>${k}</option>`).join('')}</select>
+    <label class="fl">Alternative names <span style="color:var(--muted)">(active name shown in app)</span></label>
+    <div id="e-names">${renderNamesEditor(s)}</div>
     <label class="fl">Instructions</label><textarea class="fi" id="e-desc" rows="2">${s.desc||''}</textarea>
     <label class="fl">Coaching cues</label><textarea class="fi" id="e-cues" rows="2">${s.cues||''}</textarea>
     <label class="fl">Default duration (seconds)</label><input class="fi" type="number" id="e-dur" value="${s.dur}" min="5" max="300">
@@ -1829,10 +1873,54 @@ function flashCopied(){
   const el=document.getElementById('e-fname');if(!el)return;
   const o=el.textContent;el.textContent='✓ copied!';setTimeout(()=>{if(el)el.textContent=o;},1200);
 }
+function renderNamesEditor(s){
+  const active=s.name||'';
+  const alts=(Array.isArray(s.names)?s.names:[]).filter(n=>n&&n!==active);
+  const row=(n,isActive)=>`<div class="name-row${isActive?' active':''}">
+      <button type="button" class="name-pick" title="${isActive?'active name':'make active'}" ${isActive?'disabled':`onclick="setActiveName('${s.id}','${n.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')"`}>${isActive?'★':'☆'}</button>
+      <span class="name-txt">${n.replace(/</g,'&lt;')}</span>
+      ${isActive?'<span class="name-badge">active</span>':`<button type="button" class="name-x" onclick="removeAltName('${s.id}','${n.replace(/'/g,"\\'").replace(/"/g,'&quot;')}')">✕</button>`}
+    </div>`;
+  return row(active,true)+alts.map(n=>row(n,false)).join('')+
+    `<div class="name-add"><input class="fi" id="e-altname" placeholder="add another name…" onkeydown="if(event.key==='Enter'){event.preventDefault();addAltName('${s.id}')}"><button type="button" class="btn sm" onclick="addAltName('${s.id}')">add</button></div>`;
+}
+function persistEditFields(id){
+  // capture currently-shown parts/kind/active-name into the lib entry before re-render
+  const s=lib.find(l=>l.id===id);if(!s)return;
+  const nameEl=document.getElementById('e-name');if(nameEl)s.name=nameEl.value.trim()||s.name;
+  const partsEl=document.getElementById('e-parts');
+  if(partsEl)s.parts=[...partsEl.querySelectorAll('.part-tag.on')].map(b=>b.dataset.part);
+  const kindEl=document.getElementById('e-kind');if(kindEl)s.kind=kindEl.value;
+}
+function addAltName(id){
+  const inp=document.getElementById('e-altname');if(!inp)return;
+  const v=inp.value.trim();if(!v)return;
+  persistEditFields(id);
+  const s=lib.find(l=>l.id===id);
+  s.names=namesOf(s);if(!s.names.includes(v))s.names.push(v);
+  save();editStretchModal(id);
+}
+function removeAltName(id,n){
+  persistEditFields(id);
+  const s=lib.find(l=>l.id===id);
+  s.names=namesOf(s).filter(x=>x!==n);
+  save();editStretchModal(id);
+}
+function setActiveName(id,n){
+  persistEditFields(id);
+  const s=lib.find(l=>l.id===id);
+  s.names=namesOf(s);if(!s.names.includes(n))s.names.push(n);
+  s.name=n; // active
+  save();renderLib();editStretchModal(id);
+}
 function confirmEditStretch(id){
   const s=lib.find(l=>l.id===id);if(!s)return;
   const n=document.getElementById('e-name').value.trim();if(!n)return;
-  s.name=n;s.cat=document.getElementById('e-area').value;s.area=s.cat;
+  s.name=n;
+  s.parts=[...document.getElementById('e-parts').querySelectorAll('.part-tag.on')].map(b=>b.dataset.part);
+  s.kind=document.getElementById('e-kind').value;
+  const altRaw=Array.isArray(s.names)?s.names:[];
+  s.names=[n,...altRaw.filter(x=>x&&x!==n)];
   s.desc=document.getElementById('e-desc').value.trim();
   s.cues=document.getElementById('e-cues').value.trim();
   s.dur=+document.getElementById('e-dur').value||30;
@@ -1845,7 +1933,6 @@ function deleteStretch(id){confirmSheet('Delete this stretch from the library? I
   const si=session.findIndex(q=>q.id===id);if(si>=0)session.splice(si,1);
   save();renderLib();
 });}
-function setArea(a){libArea=a;renderLib();}
 /* ── ADD A LIBRARY STRETCH TO A ROUTINE ── */
 function addToRoutinePrompt(id){
   const s=lib.find(l=>l.id===id);if(!s)return;
