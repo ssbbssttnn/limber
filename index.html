@@ -746,7 +746,40 @@ const GUIDE=[
 let lib=JSON.parse(localStorage.getItem('sx-lib')||'null')||DEFAULTS.map(s=>({...s}));
 let routines=JSON.parse(localStorage.getItem('sx-routines')||'[]');
 const BILAT='<span class="bilat" title="works both sides"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M3 12h18"/></svg></span>';
-let userImgs=JSON.parse(localStorage.getItem('sx-imgs')||'{}');
+// Uploaded photos live in IndexedDB (localStorage is too small — ~5MB — for images).
+// userImgs is an in-memory mirror so rendering stays synchronous; writes go to IDB async.
+let userImgs={};
+const PhotoDB=(function(){
+  const DB='limber-photos',STORE='imgs';let _db=null;
+  function open(){return new Promise((res,rej)=>{
+    if(_db)return res(_db);
+    const rq=indexedDB.open(DB,1);
+    rq.onupgradeneeded=()=>{const db=rq.result;if(!db.objectStoreNames.contains(STORE))db.createObjectStore(STORE);};
+    rq.onsuccess=()=>{_db=rq.result;res(_db);};
+    rq.onerror=()=>rej(rq.error);
+  });}
+  return {
+    async getAll(){
+      try{const db=await open();return await new Promise((res,rej)=>{
+        const out={};const tx=db.transaction(STORE,'readonly').objectStore(STORE);
+        const cur=tx.openCursor();
+        cur.onsuccess=e=>{const c=e.target.result;if(c){out[c.key]=c.value;c.continue();}else res(out);};
+        cur.onerror=()=>rej(cur.error);
+      });}catch(e){return {};}
+    },
+    async set(id,val){try{const db=await open();return await new Promise((res,rej)=>{
+      const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(val,id);
+      tx.oncomplete=()=>res(true);tx.onerror=()=>rej(tx.error);
+    });}catch(e){return false;}},
+    async del(id){try{const db=await open();return await new Promise((res,rej)=>{
+      const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);
+      tx.oncomplete=()=>res(true);tx.onerror=()=>rej(tx.error);
+    });}catch(e){return false;}}
+  };
+})();
+// write-through helpers: update in-memory mirror + persist to IDB (async, non-blocking)
+function putUserImg(id,dataUrl){userImgs[id]=dataUrl;PhotoDB.set(id,dataUrl);}
+function removeUserImg(id){delete userImgs[id];PhotoDB.del(id);}
 let history=JSON.parse(localStorage.getItem('sx-history')||'[]');
 let settings=JSON.parse(localStorage.getItem('sx-settings')||'{"prepTime":4,"switchTime":4,"beepOn":true,"sideOn":true,"prepBeepOn":true,"breathOn":true,"voiceOn":false,"volume":0.8,"soundWave":"sine","soundPitch":1,"theme":"blueprint"}');
 if(settings.switchTime==null)settings.switchTime=4;
@@ -760,10 +793,10 @@ function save(){
     localStorage.setItem('sx-routines',JSON.stringify(routines));
     localStorage.setItem('sx-session',JSON.stringify(session));
     localStorage.setItem('sx-history',JSON.stringify(history));
-    localStorage.setItem('sx-imgs',JSON.stringify(userImgs));
+    // NOTE: uploaded photos are NOT stored here — they live in IndexedDB (see PhotoDB).
   }catch(e){
     if(!window._storageWarned){window._storageWarned=true;
-      alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) and remove some uploaded photos to free space.');}
+      alert('Storage is full, so recent changes may not be saved between sessions. Export a backup (Settings → Data) to be safe.');}
   }
 }
 function saveSetting(k,v){settings[k]=v;try{localStorage.setItem('sx-settings',JSON.stringify(settings));}catch(e){}}
@@ -1674,15 +1707,43 @@ function buildRoutineModal(){
 }
 
 /* ── IMAGES ── */
+// Downscale + JPEG-compress an image file to keep stored photos small.
+function compressImage(file,maxPx,quality){
+  return new Promise((resolve,reject)=>{
+    const r=new FileReader();
+    r.onload=ev=>{
+      const img=new Image();
+      img.onload=()=>{
+        let w=img.width,h=img.height;
+        if(w>h&&w>maxPx){h=Math.round(h*maxPx/w);w=maxPx;}
+        else if(h>=w&&h>maxPx){w=Math.round(w*maxPx/h);h=maxPx;}
+        const c=document.createElement('canvas');c.width=w;c.height=h;
+        c.getContext('2d').drawImage(img,0,0,w,h);
+        try{resolve(c.toDataURL('image/jpeg',quality));}
+        catch(err){resolve(ev.target.result);} // fallback to original if canvas tainted
+      };
+      img.onerror=()=>resolve(ev.target.result);
+      img.src=ev.target.result;
+    };
+    r.onerror=()=>reject(r.error);
+    r.readAsDataURL(file);
+  });
+}
 function uploadImg(id){imgTarget=id;document.getElementById('img-input').click();}
 function onImgFile(e){
   const f=e.target.files[0];if(!f||!imgTarget)return;
   const id=imgTarget;
-  const r=new FileReader();
-  r.onload=ev=>{userImgs[id]=ev.target.result;save();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();renderLib();if(document.getElementById('pg-setup').classList.contains('on'))renderSetup();if(document.getElementById('e-name'))editStretchModal(id);imgTarget=null;};
-  r.readAsDataURL(f);e.target.value='';
+  compressImage(f,800,0.8).then(dataUrl=>{
+    putUserImg(id,dataUrl);
+    if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();
+    renderLib();
+    if(document.getElementById('pg-setup')?.classList.contains('on'))renderSetup();
+    if(document.getElementById('e-name'))editStretchModal(id);
+    imgTarget=null;
+  });
+  e.target.value='';
 }
-function clearUserImg(id){delete userImgs[id];save();renderLib();if(document.getElementById('pg-setup')?.classList.contains('on'))renderSetup();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();editStretchModal(id);}
+function clearUserImg(id){removeUserImg(id);renderLib();if(document.getElementById('pg-setup')?.classList.contains('on'))renderSetup();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();editStretchModal(id);}
 function imgOptions(id){
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:14px">Change photo</p>
     <div style="display:flex;flex-direction:column;gap:10px">
@@ -1690,7 +1751,7 @@ function imgOptions(id){
       ${userImgs[id]?`<button class="btn red" onclick="delImg('${id}')">Remove photo</button>`:''}</div>
     <button class="btn ghost" style="width:100%;margin-top:10px" onclick="closeModal()">Cancel</button>`);
 }
-function delImg(id){delete userImgs[id];save();closeModal();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();}
+function delImg(id){removeUserImg(id);closeModal();if(sessionStretches[tIdx]&&sessionStretches[tIdx].id===id)renderTimer();}
 
 /* Batch image manager */
 let batchQueue=[];
@@ -1716,7 +1777,7 @@ function renderBatchAssign(){
       <select class="fi" style="margin:0" onchange="assignBatch(${i},this.value)"><option value="">— pick stretch —</option>${opts}</select>
     </div>`).join('');
 }
-function assignBatch(i,id){if(!id)return;userImgs[id]=batchQueue[i];save();renderLib();}
+function assignBatch(i,id){if(!id)return;putUserImg(id,batchQueue[i]);renderLib();}
 
 /* ── LIBRARY ── */
 function renderLib(){
@@ -1984,7 +2045,12 @@ function onImportFile(e){
     try{
       const d=JSON.parse(ev.target.result);
       confirmSheet('This will replace your current routines, library, images and history. Continue?',()=>{
-        if(d.lib)lib=d.lib;if(d.routines)routines=d.routines;if(d.userImgs)userImgs=d.userImgs;if(d.history)history=d.history;if(d.settings)settings=Object.assign(settings,d.settings);
+        if(d.lib)lib=d.lib;if(d.routines)routines=d.routines;if(d.history)history=d.history;if(d.settings)settings=Object.assign(settings,d.settings);
+        if(d.userImgs&&typeof d.userImgs==='object'){
+          userImgs=d.userImgs;
+          // persist imported photos to IndexedDB
+          for(const id in userImgs){if(userImgs[id])PhotoDB.set(id,userImgs[id]);}
+        }
         save();try{localStorage.setItem('sx-settings',JSON.stringify(settings));}catch(e){}
         setTheme(settings.theme||'blueprint');
         show('routines');
@@ -2156,6 +2222,26 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
   }
   save();
   renderRoutines();renderLib();renderSettings();
+
+  // ── Photo storage init: load from IndexedDB; migrate any legacy localStorage photos ──
+  (async function initPhotos(){
+    // 1. migrate legacy photos out of localStorage (frees the space that was filling up)
+    let legacy=null;
+    try{legacy=JSON.parse(localStorage.getItem('sx-imgs')||'null');}catch(e){}
+    if(legacy&&typeof legacy==='object'){
+      for(const id in legacy){
+        if(legacy[id]){userImgs[id]=legacy[id];await PhotoDB.set(id,legacy[id]);}
+      }
+      try{localStorage.removeItem('sx-imgs');}catch(e){} // reclaim the space
+    }
+    // 2. load everything from IndexedDB into the in-memory mirror
+    const all=await PhotoDB.getAll();
+    Object.assign(userImgs,all);
+    // 3. re-render now that photos are available
+    renderRoutines();renderLib();
+    if(document.getElementById('pg-setup')?.classList.contains('on'))renderSetup();
+    if(sessionStretches[tIdx])renderTimer();
+  })();
 })();
 
 /* ── PWA: service worker + wake lock ── */
