@@ -2009,9 +2009,9 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
 
 /* ── INIT ── */
 (function(){
-  const LIB_VERSION=5; // category overhaul (20 cats), presets removed
+  const LIB_VERSION=6; // refresh names/desc/parts/kind from DEFAULTS (review-pass updates)
   const savedVersion=parseInt(localStorage.getItem('sx-libversion')||'1');
-  if(savedVersion<LIB_VERSION){
+  if(savedVersion<5){
     // Overhaul migration: replace built-in stretches with new library,
     // but KEEP user's custom stretches (ids starting with 'custom-' or 'x') and their images.
     const customs=lib.filter(s=>/^(custom-|x\d)/.test(s.id));
@@ -2019,6 +2019,24 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
     // Remove old preset routines (keep user-created routines)
     const drop=new Set([...PREBUILT.map(p=>p.name),...OLD_PREBUILT_NAMES]);
     routines=routines.filter(r=>!drop.has(r.name));
+    localStorage.setItem('sx-libversion',String(LIB_VERSION));
+  } else if(savedVersion<LIB_VERSION){
+    // v5 -> v6: refresh built-in stretch definitions (name, names, desc, cues, parts, kind,
+    // bilateral, dur, type) from DEFAULTS so review-pass edits actually land, while keeping
+    // user-created stretches and removing built-ins that no longer exist.
+    const defById=new Map(DEFAULTS.map(s=>[s.id,s]));
+    const customs=lib.filter(s=>/^(custom-|x\d)/.test(s.id));
+    const refreshed=DEFAULTS.map(d=>({...d}));
+    lib=refreshed.concat(customs.filter(c=>!defById.has(c.id)));
+    // sync saved routine copies to the refreshed definitions (names, desc, cues, etc.),
+    // preserving each slot's customised duration / PNF / qid
+    routines.forEach(r=>{
+      r.stretches=r.stretches.map(st=>{
+        const d=defById.get(st.id);
+        if(!d)return st; // custom or already-removed; leave as-is
+        return {...d,qid:st.qid,dur:st.dur,pnf:st.pnf};
+      });
+    });
     localStorage.setItem('sx-libversion',String(LIB_VERSION));
   } else {
     // normal merge for same-version updates
