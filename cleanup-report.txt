@@ -1,0 +1,137 @@
+LIMBER PHOTO CLEANUP REPORT
+================================
+mode: LIVE (files deleted)
+live stretches: 186
+photos on disk: 257
+
+ORPHAN photos (removed exercises) -> delete: 89
+   - back-pec.jpg
+   - back-stretch.jpg
+   - basic-toe-touch.jpg
+   - behind-head-chest.jpg
+   - bent-over-pendulum.jpg
+   - big-turn-back.jpg
+   - ceiling-look.jpg
+   - chest-front-shoulder.jpg
+   - chin-to-chest.jpg
+   - cross-over-shoulder.jpg
+   - double-leg-stretch.jpg
+   - elbow-flexor.jpg
+   - elbow-out-rotator.jpg
+   - external-shoulder-rotation.jpg
+   - fire-log.jpg
+   - forearm-pronator.jpg
+   - forearm-wall-slide.jpg
+   - forward-flexion-neck.jpg
+   - front-back-neck.jpg
+   - front-leg-kick.jpg
+   - full-squat-mobility.jpg
+   - garland.jpg
+   - half-sun-salutation.jpg
+   - hip-extension.jpg
+   - hip-external-rotator.jpg
+   - internal-shoulder-rotation.jpg
+   - knee-to-chest.jpg
+   - kneeling-chest.jpg
+   - kneeling-lat.jpg
+   - kneeling-neck.jpg
+   - kneeling-sartorius.jpg
+   - kneeling-tspine.jpg
+   - leg-to-side.jpg
+   - lunge-stretch.jpg
+   - lunging-calf.jpg
+   - lying-abductor.jpg
+   - lying-calf.jpg
+   - lying-lower-back.jpg
+   - lying-shoulder-sweep.jpg
+   - lying-upper-body-rotation.jpg
+   - middle-back.jpg
+   - overhead-clap.jpg
+   - peroneals.jpg
+   - plantar-flexion.jpg
+   - posterior-tibialis.jpg
+   - potty-squat.jpg
+   - reaching-up-shoulder.jpg
+   - reaching-upper-back.jpg
+   - recumbent-hip.jpg
+   - rocker-open-legs.jpg
+   - rotating-stomach.jpg
+   - rotator-cuff.jpg
+   - seated-back-twist.jpg
+   - seated-calf.jpg
+   - seated-chest-clam.jpg
+   - seated-groin.jpg
+   - seated-hip-external-rotation.jpg
+   - seated-neck-tap.jpg
+   - seated-quad.jpg
+   - seated-straight-calf.jpg
+   - serratus-wall-slide.jpg
+   - side-kick.jpg
+   - side-push-neck.jpg
+   - side-twist.jpg
+   - sitting-wide-adductor.jpg
+   - spine-stretch-forward.jpg
+   - spine-twist.jpg
+   - split-sprinter-lunge.jpg
+   - stand-spread-fold.jpg
+   - standing-abs-rotation.jpg
+   - standing-achilles.jpg
+   - standing-back-extension-flexion.jpg
+   - standing-back-rotation.jpg
+   - standing-balance-outer-hip.jpg
+   - standing-gastroc.jpg
+   - standing-half-bend.jpg
+   - standing-hamstrings-back.jpg
+   - standing-hip-flexor.jpg
+   - standing-lateral-side.jpg
+   - standing-lateral.jpg
+   - standing-low-body-rotation.jpg
+   - standing-one-arm-chest.jpg
+   - standing-outer-hip.jpg
+   - standing-quad.jpg
+   - standing-shin.jpg
+   - standing-side-stretch.jpg
+   - standing-two-side-bend.jpg
+   - standing-upper-body-rotation.jpg
+   - triceps-stretch.jpg
+
+WRONG-flagged photos -> delete (stretch still exists, needs a new photo): 31
+   - abdominal-stretch.jpg
+   - adductor.jpg
+   - bent-over-twist.jpg
+   - bridge.jpg
+   - cat-pose.jpg
+   - chair-pose.jpg
+   - corpse.jpg
+   - crocodile.jpg
+   - finger-flexor.jpg
+   - flexion-extension-hip.jpg
+   - frog-rock.jpg
+   - half-seated-leg-circle.jpg
+   - hero.jpg
+   - humble-warrior.jpg
+   - lying-hip-flexor.jpg
+   - pretzel.jpg
+   - pyramid.jpg
+   - reverse-warrior.jpg
+   - runners-stretch.jpg
+   - seated-ankle.jpg
+   - seated-lower-back.jpg
+   - seated-neck-side.jpg
+   - standing-iliotibial.jpg
+   - standing-leg-cross-abductor.jpg
+   - standing-side-bend.jpg
+   - thoracic-bridge.jpg
+   - warrior-1.jpg
+   - warrior-2.jpg
+   - warrior-3.jpg
+   - wrist-extensor.jpg
+   - wrist-flexor.jpg
+
+WRONG-flagged but no photo on disk (already missing, nothing to delete): 2
+   - gate-pose
+   - hawaiian-squat
+
+KEEPING: 137 photos
+
+TOTAL to delete: 120
