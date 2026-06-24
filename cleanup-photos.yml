@@ -1,0 +1,51 @@
+name: Clean up stretch photos
+
+# Removes orphaned photos (for deleted exercises) and photos flagged "wrong"
+# during review. Run manually from the Actions tab.
+
+on:
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Dry run (list what would be deleted, delete nothing)"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Run cleanup
+        env:
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: python cleanup_photos.py
+
+      - name: Upload report
+        uses: actions/upload-artifact@v4
+        with:
+          name: cleanup-report
+          path: cleanup-report.txt
+
+      - name: Commit deletions
+        if: ${{ inputs.dry_run == false }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "Clean up orphaned and wrong-flagged stretch photos"
+            git push
+          else
+            echo "Nothing to commit - no photos were deleted."
+          fi
