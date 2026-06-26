@@ -13,26 +13,21 @@
 <style>
 /* ============ SPAN · ARCHITECTURAL / PRECISE / TECHNICAL ============ */
 /* Engineered palettes — red accent, drafting precision */
-[data-theme="blueprint"]{--bg:#0a0e22;--surface:#0f1530;--surface2:#161d40;--border:#243056;--grid:rgba(80,110,200,0.06);--text:#dce4f5;--muted:#6478a8;--accent:#ed3426;--accent2:#ff5a4d;--accent-text:#ffffff;--accent-dim:rgba(237,52,38,0.13);--danger:#ff5a4d;}
-[data-theme="paper"]{--bg:#ddd7c9;--surface:#e9e5d9;--surface2:#d6d0c1;--border:#bdb8a8;--grid:rgba(60,60,50,0.05);--text:#1c1c1a;--muted:#7e7a70;--accent:#d62f23;--accent2:#bd2519;--accent-text:#ffffff;--accent-dim:rgba(214,47,35,0.1);--danger:#bd2519;--card-shadow:0 2px 12px -5px rgba(60,55,45,0.2);--press:rgba(0,0,0,0.06);}
-[data-theme="concrete"]{--bg:#26282b;--surface:#2f3236;--surface2:#3a3e43;--border:#4a4f55;--grid:rgba(255,255,255,0.03);--text:#e2e4e6;--muted:#8c9298;--accent:#ed3426;--accent2:#ff6155;--accent-text:#ffffff;--accent-dim:rgba(237,52,38,0.14);--danger:#ff6155;}
+[data-theme="blueprint"]{--bg:#0a0e22;--surface:#0f1530;--surface2:#161d40;--border:#243056;--grid:rgba(80,110,200,0.06);--text:#dce4f5;--muted:#6478a8;--accent:#ed3426;--accent2:#ff5a4d;--accent-text:#ffffff;--accent-dim:rgba(237,52,38,0.13);--danger:#ff5a4d;--ring:#ff2d78;}
+[data-theme="paper"]{--bg:#ddd7c9;--surface:#e9e5d9;--surface2:#d6d0c1;--border:#bdb8a8;--grid:rgba(60,60,50,0.05);--text:#1c1c1a;--muted:#7e7a70;--accent:#d62f23;--accent2:#bd2519;--accent-text:#ffffff;--accent-dim:rgba(214,47,35,0.1);--danger:#bd2519;--card-shadow:0 2px 12px -5px rgba(60,55,45,0.2);--press:rgba(0,0,0,0.06);--ring:#0a6bff;}
+[data-theme="concrete"]{--bg:#26282b;--surface:#2f3236;--surface2:#3a3e43;--border:#4a4f55;--grid:rgba(255,255,255,0.03);--text:#e2e4e6;--muted:#8c9298;--accent:#ed3426;--accent2:#ff6155;--accent-text:#ffffff;--accent-dim:rgba(237,52,38,0.14);--danger:#ff6155;--ring:#a04dff;}
 /* — inorganic — */
-[data-theme="moonlight"]{--bg:#0c1018;--surface:#141a26;--surface2:#1c2433;--border:#2b3649;--grid:rgba(140,170,220,0.05);--text:#d8e0ee;--muted:#6b7a92;--accent:#8fb3ff;--accent2:#aac6ff;--accent-text:#0c1018;--accent-dim:rgba(143,179,255,0.14);--danger:#ff6b6b;}
-[data-theme="neon"]{--bg:#08090d;--surface:#101218;--surface2:#181b24;--border:#262a36;--grid:rgba(80,235,130,0.045);--text:#e4e8ef;--muted:#6a7180;--accent:#34e878;--accent2:#66f2a0;--accent-text:#04200f;--accent-dim:rgba(52,232,120,0.13);--danger:#ff5a4d;}
 /* — organic — */
-[data-theme="clay"]{--bg:#211712;--surface:#2c1f18;--surface2:#392a20;--border:#4d3a2d;--grid:rgba(200,140,90,0.05);--text:#f0e2d6;--muted:#a08872;--accent:#d9542f;--accent2:#e87a52;--accent-text:#ffffff;--accent-dim:rgba(217,84,47,0.14);--danger:#e85a40;}
-[data-theme="ocean"]{--bg:#06151a;--surface:#0b2128;--surface2:#102e36;--border:#1c4450;--grid:rgba(70,180,190,0.05);--text:#d6eef2;--muted:#5c95a0;--accent:#2bb6c7;--accent2:#4fd0de;--accent-text:#06151a;--accent-dim:rgba(43,182,199,0.14);--danger:#ff6b6b;}
+[data-theme="clay"]{--bg:#211712;--surface:#2c1f18;--surface2:#392a20;--border:#4d3a2d;--grid:rgba(200,140,90,0.05);--text:#f0e2d6;--muted:#a08872;--accent:#d9542f;--accent2:#e87a52;--accent-text:#ffffff;--accent-dim:rgba(217,84,47,0.14);--danger:#e85a40;--ring:#ff5c33;}
+[data-theme="ocean"]{--bg:#06151a;--surface:#0b2128;--surface2:#102e36;--border:#1c4450;--grid:rgba(70,180,190,0.05);--text:#d6eef2;--muted:#5c95a0;--accent:#2bb6c7;--accent2:#4fd0de;--accent-text:#06151a;--accent-dim:rgba(43,182,199,0.14);--danger:#ff6b6b;--ring:#1fe0e0;}
 /* — mineral — */
-[data-theme="amethyst"]{--bg:#1a1230;--surface:#241836;--surface2:#2f2147;--border:#41305c;--grid:rgba(180,140,255,0.05);--text:#e6ddf2;--muted:#8a7aa6;--accent:#b884ff;--accent2:#c9a3ff;--accent-text:#15101f;--accent-dim:rgba(184,132,255,0.14);--danger:#ff6b6b;}
-[data-theme="topaz"]{--bg:#1a160e;--surface:#241f14;--surface2:#322a1a;--border:#4a3f28;--grid:rgba(230,190,90,0.05);--text:#f2e9d6;--muted:#a39072;--accent:#e6b143;--accent2:#f2c869;--accent-text:#1a160e;--accent-dim:rgba(230,177,67,0.14);--danger:#ff6b6b;}
+[data-theme="amethyst"]{--bg:#1a1230;--surface:#241836;--surface2:#2f2147;--border:#41305c;--grid:rgba(180,140,255,0.05);--text:#e6ddf2;--muted:#8a7aa6;--accent:#b884ff;--accent2:#c9a3ff;--accent-text:#15101f;--accent-dim:rgba(184,132,255,0.14);--danger:#ff6b6b;--ring:#d94dff;}
 /* — light members (one per category) — */
-[data-theme="daybreak"]{--bg:#e7eaf2;--surface:#f1f3f9;--surface2:#dde2ee;--border:#c4cadb;--grid:rgba(70,90,180,0.05);--text:#191d2a;--muted:#767e94;--accent:#3f5bd4;--accent2:#2f47b8;--accent-text:#ffffff;--accent-dim:rgba(63,91,212,0.1);--danger:#d83a3a;--card-shadow:0 2px 12px -5px rgba(40,50,90,0.18);--press:rgba(0,0,0,0.06);}
-[data-theme="quartz"]{--bg:#f0e8ed;--surface:#f7f1f5;--surface2:#e8dde6;--border:#d4c4ce;--grid:rgba(200,100,150,0.05);--text:#241920;--muted:#90778a;--accent:#c44d8a;--accent2:#ab3a76;--accent-text:#ffffff;--accent-dim:rgba(196,77,138,0.1);--danger:#d83a3a;--card-shadow:0 2px 12px -5px rgba(80,45,65,0.18);--press:rgba(0,0,0,0.06);}
-[data-theme="sage"]{--bg:#e2e7da;--surface:#ebefe4;--surface2:#d7ddca;--border:#c2c8b4;--grid:rgba(110,150,70,0.05);--text:#1a1d15;--muted:#797f6e;--accent:#5f8a3a;--accent2:#4e7430;--accent-text:#ffffff;--accent-dim:rgba(95,138,58,0.1);--danger:#c4261b;--card-shadow:0 2px 12px -5px rgba(60,70,40,0.18);--press:rgba(0,0,0,0.06);}
+[data-theme="daybreak"]{--bg:#e7eaf2;--surface:#f1f3f9;--surface2:#dde2ee;--border:#c4cadb;--grid:rgba(70,90,180,0.05);--text:#191d2a;--muted:#767e94;--accent:#3f5bd4;--accent2:#2f47b8;--accent-text:#ffffff;--accent-dim:rgba(63,91,212,0.1);--danger:#d83a3a;--card-shadow:0 2px 12px -5px rgba(40,50,90,0.18);--press:rgba(0,0,0,0.06);--ring:#7c1fff;}
+[data-theme="sage"]{--bg:#e2e7da;--surface:#ebefe4;--surface2:#d7ddca;--border:#c2c8b4;--grid:rgba(110,150,70,0.05);--text:#1a1d15;--muted:#797f6e;--accent:#5f8a3a;--accent2:#4e7430;--accent-text:#ffffff;--accent-dim:rgba(95,138,58,0.1);--danger:#c4261b;--card-shadow:0 2px 12px -5px rgba(60,70,40,0.18);--press:rgba(0,0,0,0.06);--ring:#00a86b;}
 /* — mono — */
-[data-theme="noir"]{--bg:#0a0a0b;--surface:#161618;--surface2:#1f1f22;--border:#2c2c31;--grid:rgba(255,255,255,0.03);--text:#e8e8ea;--muted:#71717a;--accent:#d4d4d8;--accent2:#e8e8ec;--accent-text:#0a0a0b;--accent-dim:rgba(212,212,216,0.1);--danger:#ef4444;}
-[data-theme="slate"]{--bg:#14171c;--surface:#1b1f26;--surface2:#252b34;--border:#333a45;--grid:rgba(140,160,200,0.035);--text:#d8dde5;--muted:#717a88;--accent:#8b9bb4;--accent2:#a6b4c9;--accent-text:#14171c;--accent-dim:rgba(139,155,180,0.12);--danger:#ef5350;}
-[data-theme="bone"]{--bg:#e9e9e7;--surface:#f3f3f1;--surface2:#dedec9;--border:#c8c8c0;--grid:rgba(60,60,55,0.045);--text:#1b1b1a;--muted:#7a7a74;--accent:#3f3f46;--accent2:#27272a;--accent-text:#ffffff;--accent-dim:rgba(63,63,70,0.08);--danger:#d8392c;--card-shadow:0 2px 12px -5px rgba(50,50,45,0.18);--press:rgba(0,0,0,0.06);}
+[data-theme="noir"]{--bg:#0a0a0b;--surface:#161618;--surface2:#1f1f22;--border:#2c2c31;--grid:rgba(255,255,255,0.03);--text:#e8e8ea;--muted:#71717a;--accent:#d4d4d8;--accent2:#e8e8ec;--accent-text:#0a0a0b;--accent-dim:rgba(212,212,216,0.1);--danger:#ef4444;--ring:#3affd0;}
+[data-theme="bone"]{--bg:#e9e9e7;--surface:#f3f3f1;--surface2:#dedec9;--border:#c8c8c0;--grid:rgba(60,60,55,0.045);--text:#1b1b1a;--muted:#7a7a74;--accent:#3f3f46;--accent2:#27272a;--accent-text:#ffffff;--accent-dim:rgba(63,63,70,0.08);--danger:#d8392c;--card-shadow:0 2px 12px -5px rgba(50,50,45,0.18);--press:rgba(0,0,0,0.06);--ring:#ff1f8f;}
 
 :root{--r:4px;--r-sm:2px;--card-shadow:0 2px 14px -6px rgba(0,0,0,0.6);--glow:0 0 0 transparent;--press:rgba(0,0,0,0.18);}
 *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
@@ -880,35 +875,20 @@ function imgFallback(el,id,big){
 
 /* ── THEME ── */
 const THEMES=[
-  {cat:'Technical',list:[
-    {id:'blueprint',name:'Blueprint',bg:'#0a0e22',accent:'#ed3426'},
-    {id:'concrete',name:'Concrete',bg:'#26282b',accent:'#ed3426'},
-    {id:'paper',name:'Paper',bg:'#ddd7c9',accent:'#d62f23'},
-  ]},
-  {cat:'Nocturne',list:[
-    {id:'moonlight',name:'Moonlight',bg:'#0c1018',accent:'#8fb3ff'},
-    {id:'neon',name:'Neon',bg:'#08090d',accent:'#34e878'},
-    {id:'daybreak',name:'Daybreak',bg:'#e7eaf2',accent:'#3f5bd4'},
-  ]},
-  {cat:'Terrain',list:[
-    {id:'clay',name:'Clay',bg:'#211712',accent:'#d9542f'},
-    {id:'ocean',name:'Ocean',bg:'#06151a',accent:'#2bb6c7'},
-    {id:'sage',name:'Sage',bg:'#e2e7da',accent:'#5f8a3a'},
-  ]},
-  {cat:'Mineral',list:[
-    {id:'amethyst',name:'Amethyst',bg:'#1a1230',accent:'#b884ff'},
-    {id:'topaz',name:'Topaz',bg:'#1a160e',accent:'#e6b143'},
-    {id:'quartz',name:'Quartz',bg:'#f0e8ed',accent:'#c44d8a'},
-  ]},
-  {cat:'Mono',list:[
-    {id:'noir',name:'Noir',bg:'#0a0a0b',accent:'#d4d4d8'},
-    {id:'slate',name:'Slate',bg:'#14171c',accent:'#8b9bb4'},
-    {id:'bone',name:'Bone',bg:'#e9e9e7',accent:'#3f3f46'},
-  ]},
+  {id:'blueprint',name:'Blueprint',bg:'#0a0e22',accent:'#ed3426'},
+  {id:'concrete',name:'Concrete',bg:'#26282b',accent:'#ed3426'},
+  {id:'paper',name:'Paper',bg:'#ddd7c9',accent:'#d62f23'},
+  {id:'daybreak',name:'Daybreak',bg:'#e7eaf2',accent:'#3f5bd4'},
+  {id:'clay',name:'Clay',bg:'#211712',accent:'#d9542f'},
+  {id:'ocean',name:'Ocean',bg:'#06151a',accent:'#2bb6c7'},
+  {id:'sage',name:'Sage',bg:'#e2e7da',accent:'#5f8a3a'},
+  {id:'amethyst',name:'Amethyst',bg:'#1a1230',accent:'#b884ff'},
+  {id:'noir',name:'Noir',bg:'#0a0a0b',accent:'#d4d4d8'},
+  {id:'bone',name:'Bone',bg:'#e9e9e7',accent:'#3f3f46'},
 ];
-const THEME_BG={blueprint:'#0a0e22',carbon:'#0d0d0f',concrete:'#26282b',paper:'#ddd7c9',cyan:'#06141a',amber:'#1a1408',moonlight:'#0c1018',sunset:'#1a0f1e',neon:'#08090d',clay:'#211712',ocean:'#06151a',moss:'#10160f',amethyst:'#1a1230',garnet:'#1c0d10',topaz:'#1a160e',daybreak:'#e7eaf2',sand:'#e8dec9',quartz:'#f0e8ed',sage:'#e2e7da',noir:'#0a0a0b',slate:'#14171c',bone:'#e9e9e7'};
-function themeName(id){for(const c of THEMES)for(const t of c.list)if(t.id===id)return t.name;return id?id.charAt(0).toUpperCase()+id.slice(1):'Blueprint';}
-const VALID_THEMES=new Set(['blueprint','paper','concrete','moonlight','neon','daybreak','clay','ocean','sage','amethyst','topaz','quartz','noir','slate','bone']);
+const THEME_BG={blueprint:'#0a0e22',carbon:'#0d0d0f',concrete:'#26282b',paper:'#ddd7c9',cyan:'#06141a',amber:'#1a1408',sunset:'#1a0f1e',clay:'#211712',ocean:'#06151a',moss:'#10160f',amethyst:'#1a1230',garnet:'#1c0d10',daybreak:'#e7eaf2',sand:'#e8dec9',sage:'#e2e7da',noir:'#0a0a0b',bone:'#e9e9e7'};
+function themeName(id){for(const t of THEMES)if(t.id===id)return t.name;return id?id.charAt(0).toUpperCase()+id.slice(1):'Blueprint';}
+const VALID_THEMES=new Set(['blueprint','paper','concrete','daybreak','clay','ocean','sage','amethyst','noir','bone']);
 function setTheme(t){
   if(!VALID_THEMES.has(t))t='blueprint'; // fall back if a removed/unknown theme was saved
   document.documentElement.setAttribute('data-theme',t);
@@ -921,14 +901,11 @@ function renderThemeGrid(){
   const g=document.getElementById('theme-grid');if(!g)return;
   g.className='theme-grid';
   let html='';
-  THEMES.forEach(c=>{
-    html+=`<div class="theme-cat">${c.cat}</div>`;
-    c.list.forEach(t=>{
-      html+=`<div class="theme-sw ${settings.theme===t.id?'on':''}" data-t="${t.id}" style="background:${t.bg}" onclick="setTheme('${t.id}')">
-        <span class="nm" style="color:${t.accent}">${t.name}</span>
-        <span class="dot" style="background:${t.accent}"></span>
-      </div>`;
-    });
+  THEMES.forEach(t=>{
+    html+=`<div class="theme-sw ${settings.theme===t.id?'on':''}" data-t="${t.id}" style="background:${t.bg}" onclick="setTheme('${t.id}')">
+      <span class="nm" style="color:${t.accent}">${t.name}</span>
+      <span class="dot" style="background:${t.accent}"></span>
+    </div>`;
   });
   g.innerHTML=html;
 }
@@ -1462,7 +1439,7 @@ function renderTimer(){
   const total=tPhase==='prep'?ePrep():tPhase==='switch'?eSwitch():s.dur;
   const circ=2*Math.PI*54;
   const pct=tLeft/total;
-  const ringCol=tPhase==='prep'?'#ffc832':tPhase==='switch'?'#78b4ff':'var(--accent)';
+  const ringCol=tPhase==='prep'?'#ffc832':tPhase==='switch'?'#78b4ff':'var(--ring)';
   const isPlaying=!!tInterval;
   const overallPct=Math.round(((tIdx)/sessionStretches.length)*100);
 
@@ -1489,6 +1466,7 @@ function renderTimer(){
           <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border)" stroke-width="3.5"/>
             <circle id="arc" cx="60" cy="60" r="54" fill="none" stroke="${ringCol}" stroke-width="6" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ*(1-pct)).toFixed(1)}" stroke-linecap="round" style="filter:drop-shadow(0 0 5px ${ringCol})"/>
+            ${(tPhase==='stretch'&&s.bilateral&&!s.pnf)?`<line x1="60" y1="112" x2="60" y2="100" stroke="var(--bg)" stroke-width="7"/><line x1="60" y1="111" x2="60" y2="101" stroke="${sideSwitched?'var(--muted)':'#78b4ff'}" stroke-width="2.5" stroke-linecap="round"/>`:''}
           </svg>
           <div class="tnum" id="tnum">${tLeft}</div>
         </div>
@@ -1575,6 +1553,7 @@ function tickT(){
       // switchTime 0 → just continue without a pause
     }
     if(tPhase==='switch'){
+      if(settings.beepOn&&tLeft<=3&&tLeft>0)playSound(tLeft===1?'countdownFinal':'countdown');
       tLeft--;
       const total=eSwitch();const circ=2*Math.PI*54;
       document.getElementById('arc')?.setAttribute('stroke-dashoffset',(circ*(1-tLeft/total)).toFixed(1));
