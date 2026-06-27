@@ -169,6 +169,25 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 .tlabel{font-size:10px;font-family:'JetBrains Mono',monospace;font-weight:400;letter-spacing:0.16em;color:var(--accent);text-transform:uppercase;margin-bottom:5px}
 .tname{font-family:'JetBrains Mono',monospace;font-size:21px;font-weight:700;letter-spacing:-0.02em;line-height:1.25;text-align:center}
 .cue-box{width:100%;margin-top:14px;background:var(--surface);border:1px solid var(--border);border-left:2px solid var(--accent);border-radius:var(--r);padding:12px 15px;font-size:13px;color:var(--text);line-height:1.55;text-align:left}
+.upnext-slot:empty{display:none}
+.upnext-card{display:flex;align-items:center;gap:12px;width:100%;margin-top:12px;background:var(--surface2);border:1.5px solid var(--ring);border-radius:var(--r);padding:10px 14px;animation:unpop .3s ease}
+@keyframes unpop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.upnext-card img{width:44px;height:44px;border-radius:6px;object-fit:cover;flex-shrink:0;background:#fff}
+.upnext-card .un-txt{flex:1;text-align:left;min-width:0}
+.upnext-card .un-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--ring);font-weight:600}
+.upnext-card .un-name{font-size:14px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.upnext-card .un-dur{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
+.quick-fab{position:fixed;right:16px;bottom:78px;z-index:30;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:var(--accent-text,#fff);box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.quick-fab svg{width:24px;height:24px}
+.quick-fab:active{transform:scale(.93)}
+body.in-go .quick-fab{display:none}
+.q-dur-row{display:flex;justify-content:center;margin:6px 0 12px}
+.stepper.big{display:flex;align-items:center;gap:18px;font-size:22px;font-family:'JetBrains Mono',monospace}
+.stepper.big button{width:44px;height:44px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:24px;cursor:pointer}
+.stepper.big span{min-width:70px;text-align:center;font-weight:600}
+.q-presets{display:flex;flex-wrap:wrap;gap:7px;justify-content:center}
+.q-preset{font-family:'JetBrains Mono',monospace;font-size:12px;padding:8px 13px;border-radius:20px;border:1.5px solid var(--border);background:var(--surface);color:var(--muted);cursor:pointer}
+.q-preset:active{background:var(--accent);color:#fff;border-color:var(--accent)}
 .cue-box.expandable{cursor:pointer}
 .cue-full{margin-top:8px;padding-top:8px;border-top:1px solid var(--border);font-size:12px;text-align:left;display:none;color:var(--muted)}
 .cue-full.open{display:block}
@@ -430,6 +449,10 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
       <div class="stepper"><button onclick="adjSwitchTime(-1)">−</button><span id="set-switch">4s</span><button onclick="adjSwitchTime(1)">+</button></div>
     </div>
     <div class="srow">
+      <div><div class="slbl">"Up next" preview</div><div class="ssub">Show the next stretch this many seconds before the current one ends (0 = off)</div></div>
+      <div class="stepper"><button onclick="adjUpNext(-1)">−</button><span id="set-upnext">10s</span><button onclick="adjUpNext(1)">+</button></div>
+    </div>
+    <div class="srow">
       <div><div class="slbl">Skip prep on first stretch</div><div class="ssub">Start the first stretch immediately</div></div>
       <label class="tog"><input type="checkbox" id="tog-skipprep" onchange="saveSetting('skipFirstPrep',this.checked)"><span class="tog-sl"></span></label>
     </div></div>
@@ -496,6 +519,9 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
     <div class="rb-time" id="rb-time"></div>
     <svg class="rb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 6 15 12 9 18"/></svg>
   </div>
+  <button class="quick-fab" onclick="quickTimerModal()" title="Quick timer" aria-label="Quick timer">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
+  </button>
   <nav class="nav">
     <button class="nb on" data-p="routines" onclick="show('routines')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>routines</button>
@@ -725,6 +751,16 @@ const GUIDE=[
 
 /* ── STATE ── */
 let lib=JSON.parse(localStorage.getItem('sx-lib')||'null')||DEFAULTS.map(s=>({...s}));
+// Re-hydrate built-in stretches from DEFAULTS: we slim desc/cues/names out of built-ins
+// before saving (to keep localStorage small), so restore them here on load. Any per-stretch
+// fields the user can edit and that ARE persisted (e.g. dur overrides live on routine copies,
+// not the library) are untouched. Custom stretches keep their stored values.
+(function hydrateLib(){
+  const defById=new Map(DEFAULTS.map(s=>[s.id,s]));
+  // Built-in stretches always take their definition from DEFAULTS (the source of truth that
+  // ships in the code and is updated via the review pipeline). Custom stretches keep stored values.
+  lib=lib.map(s=>{const d=defById.get(s.id);return d?{...d}:s;});
+})();
 let routines=JSON.parse(localStorage.getItem('sx-routines')||'[]');
 const BILAT='<span class="bilat" title="works both sides"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/><path d="M3 12h18"/></svg></span>';
 // Uploaded photos live in IndexedDB (localStorage is too small — ~5MB — for images).
@@ -762,7 +798,8 @@ const PhotoDB=(function(){
 function putUserImg(id,dataUrl){userImgs[id]=dataUrl;PhotoDB.set(id,dataUrl);}
 function removeUserImg(id){delete userImgs[id];PhotoDB.del(id);}
 let history=JSON.parse(localStorage.getItem('sx-history')||'[]');
-let settings=JSON.parse(localStorage.getItem('sx-settings')||'{"prepTime":4,"switchTime":4,"beepOn":true,"sideOn":true,"prepBeepOn":true,"breathOn":true,"voiceOn":false,"volume":0.8,"soundWave":"sine","soundPitch":1,"theme":"blueprint"}');
+let settings=JSON.parse(localStorage.getItem('sx-settings')||'{"prepTime":4,"switchTime":4,"beepOn":true,"sideOn":true,"prepBeepOn":true,"breathOn":true,"voiceOn":false,"volume":0.8,"soundWave":"sine","soundPitch":1,"theme":"blueprint","upNextLead":10}');
+if(settings.upNextLead===undefined)settings.upNextLead=10;
 if(settings.switchTime==null)settings.switchTime=4;
 
 let libParts=[],libKinds=[],imgTarget=null,dragSrc=null;
@@ -770,7 +807,17 @@ let tInterval=null,tIdx=0,tLeft=0,tPhase='stretch',sideSwitched=false,sessionStr
 
 function save(){
   try{
-    localStorage.setItem('sx-lib',JSON.stringify(lib));
+    // Slim built-ins before persisting: desc/cues/names/parts/kind for built-in stretches
+    // are re-hydrated from DEFAULTS on load (see LIB_VERSION migration), so storing them in
+    // localStorage is redundant and was the main cause of quota pressure. Custom stretches
+    // (id starts with 'custom-' or 'x') are stored in full.
+    const defIds=new Set(DEFAULTS.map(s=>s.id));
+    const slimLib=lib.map(s=>{
+      if(!defIds.has(s.id))return s; // custom — keep everything
+      const{desc,cues,names,...rest}=s; // drop heavy redundant fields for built-ins
+      return rest;
+    });
+    localStorage.setItem('sx-lib',JSON.stringify(slimLib));
     localStorage.setItem('sx-routines',JSON.stringify(routines));
     localStorage.setItem('sx-session',JSON.stringify(session));
     localStorage.setItem('sx-history',JSON.stringify(history));
@@ -1000,6 +1047,7 @@ document.addEventListener('touchstart',()=>{try{getCtx().resume();}catch(e){}},{
 /* ── NAV ── */
 function show(p){
   if(p!=='go')releaseWakeLock();
+  document.body.classList.toggle('in-go',p==='go');
   document.querySelectorAll('.pg').forEach(el=>el.classList.remove('on'));
   // nav highlight (editing a routine lights Routines; the timer lights none)
   const navMap={routines:'routines',library:'library',setup:'routines',progress:'progress',settings:'settings',guide:'library'};
@@ -1100,6 +1148,7 @@ function renderSettings(){
   const s=settings;
   document.getElementById('set-prep').textContent=s.prepTime+'s';
   document.getElementById('set-switch').textContent=(s.switchTime!=null?s.switchTime:4)+'s';
+  {const un=document.getElementById('set-upnext');if(un)un.textContent=(s.upNextLead!=null?s.upNextLead:10)+'s';}
   document.getElementById('tog-voice').checked=!!s.voiceOn;
   document.getElementById('tog-beep').checked=s.beepOn!==false;
   document.getElementById('tog-side').checked=s.sideOn!==false;
@@ -1186,6 +1235,7 @@ function previewVoice(){const wasOn=settings.voiceOn;settings.voiceOn=true;speak
 if('speechSynthesis' in window){speechSynthesis.onvoiceschanged=()=>{if(document.getElementById('pg-settings')?.classList.contains('on'))renderVoicePicker();};}
 function adjPrepTime(d){settings.prepTime=Math.max(0,Math.min(60,settings.prepTime+d));document.getElementById('set-prep').textContent=settings.prepTime+'s';saveSetting('prepTime',settings.prepTime);}
 function adjSwitchTime(d){const cur=settings.switchTime!=null?settings.switchTime:4;settings.switchTime=Math.max(0,Math.min(30,cur+d));document.getElementById('set-switch').textContent=settings.switchTime+'s';saveSetting('switchTime',settings.switchTime);}
+function adjUpNext(d){const cur=settings.upNextLead!=null?settings.upNextLead:10;settings.upNextLead=Math.max(0,Math.min(30,cur+d));document.getElementById('set-upnext').textContent=settings.upNextLead+'s';saveSetting('upNextLead',settings.upNextLead);}
 function setVol(v){settings.volume=parseFloat(v);document.getElementById('vol-label').textContent=Math.round(v*100)+'%';saveSetting('volume',settings.volume);}
 
 
@@ -1388,8 +1438,43 @@ function saveRoutineChanges(){
 }
 
 /* ── TIMER ── */
+let _quickDur=30,_quickBil=false;
+function quickTimerModal(){
+  _quickDur=30;_quickBil=false;
+  openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:4px">Quick timer</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">A one-off timer for any stretch — no need to add it to the library.</p>
+    <label class="fl">Name <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label>
+    <input class="fi" id="q-name" placeholder="Quick stretch">
+    <label class="fl">Hold time</label>
+    <div class="q-dur-row">
+      <div class="stepper big"><button onclick="quickAdj(-15)">−</button><span id="q-dur">30s</span><button onclick="quickAdj(15)">+</button></div>
+    </div>
+    <div class="q-presets">${[20,30,45,60,90,120].map(v=>`<button class="q-preset" onclick="quickSet(${v})">${v}s</button>`).join('')}</div>
+    <div class="srow" style="margin-top:18px;padding:0">
+      <div><div class="slbl">Switch sides</div><div class="ssub">Splits the time — half per side with a switch alert</div></div>
+      <label class="tog"><input type="checkbox" id="q-bil" onchange="_quickBil=this.checked"><span class="tog-sl"></span></label>
+    </div>
+    <button class="btn ac" style="width:100%;margin-top:20px;padding:14px" onclick="startQuickTimer()">▶ Start</button>`);
+}
+function quickAdj(d){_quickDur=Math.max(5,Math.min(600,_quickDur+d));document.getElementById('q-dur').textContent=_quickDur+'s';}
+function quickSet(v){_quickDur=v;document.getElementById('q-dur').textContent=_quickDur+'s';}
+function startQuickTimer(){
+  const nm=(document.getElementById('q-name')?.value||'').trim()||'Quick stretch';
+  const bil=document.getElementById('q-bil')?.checked||false;
+  closeModal();
+  sessionStretches=[{id:'__quick__',name:nm,area:'',cat:'Quick',dur:_quickDur,bilateral:bil,desc:'',cues:'',_quick:true}];
+  clearInterval(tInterval);tInterval=null;tIdx=0;sideSwitched=false;pnfCycle=0;
+  tPhase='stretch';tLeft=_quickDur;
+  _sessionStart=Date.now();_quickMode=true;
+  sessionActive=true;updateGoNav();
+  requestWakeLock();
+  show('go');renderTimer();
+  toggleT(); // auto-start
+}
+let _quickMode=false;
 function startGo(){
   if(!session.length){alert('Add some stretches first.');return;}
+  _quickMode=false;
   sessionStretches=session.map(s=>({...s}));
   clearInterval(tInterval);tInterval=null;tIdx=0;sideSwitched=false;pnfCycle=0;
   const skipFirst=settings.skipFirstPrep&&true;
@@ -1414,6 +1499,14 @@ function eSwitch(){const r=window._routineSwitch;return r!=null?r:(settings.swit
 function renderTimer(){
   const el=document.getElementById('go-inner');
   if(tIdx>=sessionStretches.length){
+    if(_quickMode){
+      sessionActive=false;releaseWakeLock();updateGoNav();
+      el.innerHTML=`<div class="done-pg"><div class="big">✓</div><h2>done</h2><p>Quick timer finished.</p>
+        <button class="btn ac" onclick="quickTimerModal()">another quick timer</button>
+        <button class="btn" style="margin-top:8px" onclick="show('routines')">done</button></div>`;
+      playSound('done');speak('Done.');
+      return;
+    }
     logSession();
     sessionActive=false;releaseWakeLock();updateGoNav();
     el.innerHTML=`<div class="done-pg"><div class="big">✓</div><h2>all done</h2><p id="done-sub">Great session.</p>
@@ -1440,7 +1533,6 @@ function renderTimer(){
     </div>
     <div class="img-box" id="img-box">
       ${imgTag(s.id,{cls:'timer-img',big:true})}
-      <button class="img-change" onclick="imgOptions('${s.id}')">change photo</button>
     </div>
     <div class="timer-body">
       <div class="tlabel">${tPhase==='prep'?'get ready':tPhase==='switch'?'switch sides':catOf(s)}</div>
@@ -1449,6 +1541,7 @@ function renderTimer(){
       ${tPhase==='switch'?`<div class="phase-banner side">↔ Switch sides — reposition</div>`:''}
       ${tPhase==='stretch'&&s.pnf?`<div class="phase-banner pnf" id="pnf-banner">${pnfPhaseLabel()}</div>`:''}
       ${(tPhase==='stretch'||tPhase==='switch')&&(s.cues||s.desc)?`<div class="cue-box expandable" onclick="this.querySelector('.cue-full')?.classList.toggle('open')">${escapeHTML(s.cues||s.desc)}${s.desc&&s.cues&&s.desc!==s.cues?`<div class="cue-full">${escapeHTML(s.desc)}</div><div class="cue-hint">tap for full instructions</div>`:''}</div>`:''}
+      <div class="upnext-slot" id="upnext-slot">${upNextHTML()}</div>
       <div class="timer-row">
         <div class="ring-wrap" id="ring-wrap" ontouchstart="ringTouchStart(event)" ontouchmove="ringTouchMove(event)" ontouchend="ringTouchEnd(event)" onmousedown="ringMouseDown(event)">
           <div class="breath-ring" id="breath-ring"></div>
@@ -1478,6 +1571,13 @@ function renderTimer(){
 }
 
 /* PNF phases: split stretch into relax/tense cycles */
+function upNextHTML(){
+  const lead=settings.upNextLead||10;
+  if(lead<=0||tPhase!=='stretch')return'';
+  const next=sessionStretches[tIdx+1];
+  if(!next||tLeft>lead)return'';
+  return `<div class="upnext-card">${imgSrc(next.id)?`<img src="${imgSrc(next.id)}" onerror="this.style.display='none'">`:''}<div class="un-txt"><div class="un-lbl">UP NEXT</div><div class="un-name">${escapeHTML(next.name)}</div></div><div class="un-dur">${next.dur}s${next.bilateral?' · '+Math.floor(next.dur/2)+'/side':''}</div></div>`;
+}
 function pnfPhaseLabel(){
   const s=sessionStretches[tIdx];if(!s.pnf)return'';
   return pnfTensing
@@ -1572,6 +1672,7 @@ function tickT(){
     const total=tPhase==='prep'?ePrep():s.dur;const circ=2*Math.PI*54;
     document.getElementById('arc')?.setAttribute('stroke-dashoffset',(circ*(1-tLeft/total)).toFixed(1));
     const n=document.getElementById('tnum');if(n)n.textContent=tLeft;
+    if(tPhase==='stretch'){const us=document.getElementById('upnext-slot');if(us){const h=upNextHTML();if(us.innerHTML.trim()===''&&h!=='')us.innerHTML=h;}}
     if(tLeft<=0){
       clearInterval(tInterval);tInterval=null;stopBreathPacer();
       if(tPhase==='prep'){tPhase='stretch';tLeft=sessionStretches[tIdx].dur;sideSwitched=false;if(settings.prepBeepOn)playSound('go');speak(sessionStretches[tIdx].name);renderTimer();keepRunning();}
