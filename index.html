@@ -177,10 +177,8 @@ body.has-resume{padding-bottom:calc(166px + env(safe-area-inset-bottom,0px))}
 .upnext-card .un-lbl{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.16em;color:var(--ring);font-weight:600}
 .upnext-card .un-name{font-size:14px;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .upnext-card .un-dur{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--muted);flex-shrink:0}
-.quick-fab{position:fixed;right:16px;bottom:78px;z-index:30;width:52px;height:52px;border-radius:50%;background:var(--accent);border:none;color:var(--accent-text,#fff);box-shadow:0 4px 14px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center}
-.quick-fab svg{width:24px;height:24px}
-.quick-fab:active{transform:scale(.93)}
-body.in-go .quick-fab{display:none}
+.nb-quick svg{color:var(--accent)}
+.nb-quick:active{opacity:.7}
 .q-dur-row{display:flex;justify-content:center;margin:6px 0 12px}
 .stepper.big{display:flex;align-items:center;gap:18px;font-size:22px;font-family:'JetBrains Mono',monospace}
 .stepper.big button{width:44px;height:44px;border-radius:var(--r);border:1.5px solid var(--border);background:var(--surface2);color:var(--text);font-size:24px;cursor:pointer}
@@ -200,6 +198,10 @@ body.in-go .quick-fab{display:none}
 
 .timer-row{display:flex;align-items:center;justify-content:center;gap:22px;margin-top:18px;margin-bottom:8px}
 .ring-wrap{position:relative;width:130px;height:130px;flex-shrink:0;touch-action:none}
+.tctrl-left{display:flex;flex-direction:column;align-items:center;justify-content:center;width:66px;flex-shrink:0}
+.ring-add{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:50%;background:none;border:1.5px solid var(--border);color:var(--accent);cursor:pointer}
+.ring-add svg{width:24px;height:24px}
+.ring-add:active{transform:scale(.92);background:var(--surface2)}
 .ring-wrap svg{width:100%;height:100%;transform:rotate(-90deg)}
 .tnum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'JetBrains Mono',monospace;font-size:42px;font-weight:700;letter-spacing:-0.02em;font-variant-numeric:tabular-nums;color:var(--text)}
 .breath-ring{position:absolute;inset:14px;border-radius:50%;border:1px solid var(--accent-dim);opacity:0;pointer-events:none}
@@ -519,14 +521,13 @@ body.in-go .quick-fab{display:none}
     <div class="rb-time" id="rb-time"></div>
     <svg class="rb-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="9 6 15 12 9 18"/></svg>
   </div>
-  <button class="quick-fab" onclick="quickTimerModal()" title="Quick timer" aria-label="Quick timer">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>
-  </button>
   <nav class="nav">
     <button class="nb on" data-p="routines" onclick="show('routines')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>routines</button>
     <button class="nb" data-p="library" onclick="show('library')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>library</button>
+    <button class="nb nb-quick" onclick="quickTimerModal()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M9 2h6"/></svg>quick</button>
     <button class="nb" data-p="progress" onclick="show('progress')">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 3v18h18"/><path d="M18 9l-5 5-3-3-4 4"/></svg>progress</button>
     <button class="nb" data-p="settings" onclick="show('settings')">
@@ -1442,9 +1443,7 @@ let _quickDur=30,_quickBil=false;
 function quickTimerModal(){
   _quickDur=30;_quickBil=false;
   openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:4px">Quick timer</p>
-    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">A one-off timer for any stretch — no need to add it to the library.</p>
-    <label class="fl">Name <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label>
-    <input class="fi" id="q-name" placeholder="Quick stretch">
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">A one-off timer for any stretch — set a time and go.</p>
     <label class="fl">Hold time</label>
     <div class="q-dur-row">
       <div class="stepper big"><button onclick="quickAdj(-15)">−</button><span id="q-dur">30s</span><button onclick="quickAdj(15)">+</button></div>
@@ -1459,19 +1458,77 @@ function quickTimerModal(){
 function quickAdj(d){_quickDur=Math.max(5,Math.min(600,_quickDur+d));document.getElementById('q-dur').textContent=_quickDur+'s';}
 function quickSet(v){_quickDur=v;document.getElementById('q-dur').textContent=_quickDur+'s';}
 function startQuickTimer(){
-  const nm=(document.getElementById('q-name')?.value||'').trim()||'Quick stretch';
   const bil=document.getElementById('q-bil')?.checked||false;
   closeModal();
-  sessionStretches=[{id:'__quick__',name:nm,area:'',cat:'Quick',dur:_quickDur,bilateral:bil,desc:'',cues:'',_quick:true}];
+  sessionStretches=[{id:'__quick__',name:'Quick stretch',area:'',cat:'Quick',dur:_quickDur,bilateral:bil,desc:'',cues:'',_quick:true}];
   clearInterval(tInterval);tInterval=null;tIdx=0;sideSwitched=false;pnfCycle=0;
   tPhase='stretch';tLeft=_quickDur;
-  _sessionStart=Date.now();_quickMode=true;
+  _sessionStart=Date.now();_quickMode=true;_quickLast={dur:_quickDur,bilateral:bil};
   sessionActive=true;updateGoNav();
   requestWakeLock();
   show('go');renderTimer();
-  toggleT(); // auto-start
+  toggleT();
 }
-let _quickMode=false;
+let _quickMode=false,_quickLast=null;
+let _insDur=30,_insBil=false;
+function insertQuickModal(){
+  _insDur=30;_insBil=false;
+  const wasPlaying=!!tInterval;
+  if(wasPlaying)toggleT(); // pause while choosing
+  window._insResume=wasPlaying;
+  openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:4px">Add a stretch</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:18px">Drops in right after the current stretch — just for this session.</p>
+    <label class="fl">Hold time</label>
+    <div class="q-dur-row"><div class="stepper big"><button onclick="insAdj(-15)">−</button><span id="ins-dur">30s</span><button onclick="insAdj(15)">+</button></div></div>
+    <div class="q-presets">${[20,30,45,60,90,120].map(v=>`<button class="q-preset" onclick="insSet(${v})">${v}s</button>`).join('')}</div>
+    <div class="srow" style="margin-top:18px;padding:0">
+      <div><div class="slbl">Switch sides</div><div class="ssub">Splits the time — half per side</div></div>
+      <label class="tog"><input type="checkbox" id="ins-bil" onchange="_insBil=this.checked"><span class="tog-sl"></span></label>
+    </div>
+    <button class="btn ac" style="width:100%;margin-top:20px;padding:14px" onclick="confirmInsert()">Add next ↓</button>`);
+}
+function insAdj(d){_insDur=Math.max(5,Math.min(600,_insDur+d));document.getElementById('ins-dur').textContent=_insDur+'s';}
+function insSet(v){_insDur=v;document.getElementById('ins-dur').textContent=_insDur+'s';}
+function confirmInsert(){
+  const bil=document.getElementById('ins-bil')?.checked||false;
+  const stretch={id:'__quick__',name:'Quick stretch',area:'',cat:'Quick',dur:_insDur,bilateral:bil,desc:'',cues:'',_quick:true};
+  sessionStretches.splice(tIdx+1,0,stretch); // insert right after current
+  closeModal();
+  renderTimer();
+  if(window._insResume)toggleT(); // resume if it was running
+}
+function graduateQuick(){
+  const last=_quickLast||{dur:30,bilateral:false};
+  window._gradParts=[];window._gradKinds=[];
+  openModal(`<p style="font-size:18px;font-weight:500;margin-bottom:4px">Save as a stretch</p>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Add this to your library so you can reuse it or put it in a routine.</p>
+    <label class="fl">Name</label><input class="fi" id="g-name" placeholder="e.g. Standing side bend">
+    <label class="fl">Category</label><select class="fi" id="g-cat">${CATS.map(a=>`<option value="${a}">${a}</option>`).join('')}</select>
+    <label class="fl">Body parts <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label>
+    <div class="tag-grid">${PARTS.map(p=>`<div class="ctag" onclick="toggleGradTag('part','${escapeHTML(p)}',this)">${p}</div>`).join('')}</div>
+    <label class="fl">Kind <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label>
+    <div class="tag-grid">${KINDS.map(k=>`<div class="ctag" onclick="toggleGradTag('kind','${escapeHTML(k)}',this)">${k}</div>`).join('')}</div>
+    <label class="fl">Instructions <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label><textarea class="fi" id="g-desc" rows="2"></textarea>
+    <label class="fl">Cues <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label><textarea class="fi" id="g-cues" rows="2"></textarea>
+    <div class="row2" style="display:flex;gap:10px"><div style="flex:1"><label class="fl">Hold (s)</label><input class="fi" type="number" id="g-dur" value="${last.dur}"></div></div>
+    <div class="srow" style="margin-top:14px;padding:0"><div><div class="slbl">Switch sides</div></div><label class="tog"><input type="checkbox" id="g-bil" ${last.bilateral?'checked':''}><span class="tog-sl"></span></label></div>
+    <label class="fl">Add to a routine <span style="text-transform:none;letter-spacing:0;opacity:.6">— optional</span></label>
+    <select class="fi" id="g-routine"><option value="">— don't add —</option>${routines.map((r,i)=>`<option value="${i}">${escapeHTML(r.name)}</option>`).join('')}</select>
+    <button class="btn ac" style="width:100%;margin-top:18px;padding:13px" onclick="confirmGraduate()">Save stretch</button>`);
+  setTimeout(()=>document.getElementById('g-name')?.focus(),80);
+}
+function toggleGradTag(type,v,el){el.classList.toggle('on');const arr=type==='part'?window._gradParts:window._gradKinds;const i=arr.indexOf(v);if(i<0)arr.push(v);else arr.splice(i,1);}
+function confirmGraduate(){
+  const n=(document.getElementById('g-name')?.value||'').trim();if(!n){alert('Give it a name first.');return;}
+  const obj={id:slugId(n),name:n,area:document.getElementById('g-cat').value,cat:document.getElementById('g-cat').value,desc:(document.getElementById('g-desc').value||'').trim(),cues:(document.getElementById('g-cues').value||'').trim(),dur:+document.getElementById('g-dur').value||30,bilateral:document.getElementById('g-bil').checked,pnf:false};
+  if(window._gradParts&&window._gradParts.length)obj.parts=window._gradParts.slice();
+  if(window._gradKinds&&window._gradKinds.length)obj.kind=window._gradKinds.slice();
+  lib.push(obj);
+  const ri=document.getElementById('g-routine').value;
+  if(ri!==''){const r=routines[+ri];if(r)r.stretches.push({...obj,qid:uid()});}
+  save();closeModal();renderLib();renderRoutines();
+  alert('Saved “'+n+'” to your library'+(ri!==''?' and added it to '+routines[+ri].name:'')+'.');
+}
 function startGo(){
   if(!session.length){alert('Add some stretches first.');return;}
   _quickMode=false;
@@ -1502,8 +1559,9 @@ function renderTimer(){
     if(_quickMode){
       sessionActive=false;releaseWakeLock();updateGoNav();
       el.innerHTML=`<div class="done-pg"><div class="big">✓</div><h2>done</h2><p>Quick timer finished.</p>
-        <button class="btn ac" onclick="quickTimerModal()">another quick timer</button>
-        <button class="btn" style="margin-top:8px" onclick="show('routines')">done</button></div>`;
+        <button class="btn" onclick="quickTimerModal()">another quick timer</button>
+        <button class="btn" style="margin-top:8px" onclick="graduateQuick()">+ save as a stretch</button>
+        <button class="btn ac" style="margin-top:8px" onclick="show('routines')">close</button></div>`;
       playSound('done');speak('Done.');
       return;
     }
@@ -1532,7 +1590,7 @@ function renderTimer(){
       <span class="timer-count">${tIdx+1}/${sessionStretches.length}</span>
     </div>
     <div class="img-box" id="img-box">
-      ${imgTag(s.id,{cls:'timer-img',big:true})}
+      ${s._quick?'':imgTag(s.id,{cls:'timer-img',big:true})}
     </div>
     <div class="timer-body">
       <div class="tlabel">${tPhase==='prep'?'get ready':tPhase==='switch'?'switch sides':catOf(s)}</div>
@@ -1543,6 +1601,9 @@ function renderTimer(){
       ${(tPhase==='stretch'||tPhase==='switch')&&(s.cues||s.desc)?`<div class="cue-box expandable" onclick="this.querySelector('.cue-full')?.classList.toggle('open')">${escapeHTML(s.cues||s.desc)}${s.desc&&s.cues&&s.desc!==s.cues?`<div class="cue-full">${escapeHTML(s.desc)}</div><div class="cue-hint">tap for full instructions</div>`:''}</div>`:''}
       <div class="upnext-slot" id="upnext-slot">${upNextHTML()}</div>
       <div class="timer-row">
+        <div class="tctrl-left">
+          ${_quickMode?'':`<button class="ring-add" onclick="insertQuickModal()" title="Add a stretch to this session"><svg viewBox="0 0 24 24" fill="none"><circle cx="10" cy="13" r="7" stroke="currentColor" stroke-width="2"/><path d="M10 10v3l2 1.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="19" cy="5" r="4.5" fill="currentColor"/><path d="M19 3v4M17 5h4" stroke="var(--bg)" stroke-width="1.8" stroke-linecap="round"/></svg></button>`}
+        </div>
         <div class="ring-wrap" id="ring-wrap" ontouchstart="ringTouchStart(event)" ontouchmove="ringTouchMove(event)" ontouchend="ringTouchEnd(event)" onmousedown="ringMouseDown(event)">
           <div class="breath-ring" id="breath-ring"></div>
           <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
@@ -2432,6 +2493,17 @@ function maybeClose(e){if(e.target===document.getElementById('overlay'))closeMod
     console.log('  TOTAL: '+total.toFixed(1)+' KB (limit ~5000 KB)');
     return total;
   };
+
+  // ── On load: purge any legacy photo blob and force a slim re-save of the library ──
+  // Immediately shrinks sx-lib (built-ins no longer store their long text), so the storage
+  // readout reflects the smaller size right away instead of waiting for the next edit.
+  try{
+    if(localStorage.getItem('sx-imgs')!==null){
+      try{const leg=JSON.parse(localStorage.getItem('sx-imgs')||'{}');for(const id in leg){if(leg[id]){userImgs[id]=leg[id];PhotoDB.set(id,leg[id]);}}}catch(_){}
+      localStorage.removeItem('sx-imgs');
+    }
+    save();
+  }catch(_){}
 })();
 
 /* ── PWA: service worker + wake lock ── */
