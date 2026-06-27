@@ -991,6 +991,8 @@ function playSound(type){
   else if(type==='done')SOUNDS[soundFor('done')]();
   else if(type==='pnfTense')tone(330,0.15,0.35,0,'triangle');
   else if(type==='pnfRelax')tone(550,0.15,0.35,0,'sine');
+  else if(type==='countIn')tone(440,0.08,0.3,0,'sine');
+  else if(type==='go')tone(880,0.18,0.4,0,'triangle');
 }
 function previewSound(name){if(SOUNDS[name])SOUNDS[name]();}
 document.addEventListener('touchstart',()=>{try{getCtx().resume();}catch(e){}},{once:true});
@@ -1426,7 +1428,7 @@ function renderTimer(){
   const total=tPhase==='prep'?ePrep():tPhase==='switch'?eSwitch():s.dur;
   const circ=2*Math.PI*54;
   const pct=tLeft/total;
-  const ringCol=tPhase==='prep'?'#ffc832':tPhase==='switch'?'#78b4ff':'var(--ring)';
+  const ringCol=tPhase==='prep'?'var(--accent)':tPhase==='switch'?'#78b4ff':'var(--ring)';
   const isPlaying=!!tInterval;
   const overallPct=Math.round(((tIdx)/sessionStretches.length)*100);
 
@@ -1453,7 +1455,7 @@ function renderTimer(){
           <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
             <circle cx="60" cy="60" r="54" fill="none" stroke="var(--border)" stroke-width="3.5"/>
             <circle id="arc" cx="60" cy="60" r="54" fill="none" stroke="${ringCol}" stroke-width="6" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ*(1-pct)).toFixed(1)}" stroke-linecap="round" style="filter:drop-shadow(0 0 5px ${ringCol})"/>
-            ${(tPhase==='stretch'&&s.bilateral&&!s.pnf)?`<line x1="60" y1="112" x2="60" y2="100" stroke="var(--bg)" stroke-width="7"/><line x1="60" y1="111" x2="60" y2="101" stroke="${sideSwitched?'var(--muted)':'#78b4ff'}" stroke-width="2.5" stroke-linecap="round"/>`:''}
+            ${(tPhase==='stretch'&&s.bilateral&&!s.pnf)?`<line x1="2" y1="60" x2="14" y2="60" stroke="var(--bg)" stroke-width="7"/><line x1="3" y1="60" x2="13" y2="60" stroke="${sideSwitched?'var(--muted)':'#78b4ff'}" stroke-width="2.5" stroke-linecap="round"/>`:''}
           </svg>
           <div class="tnum" id="tnum">${tLeft}</div>
         </div>
@@ -1540,15 +1542,16 @@ function tickT(){
       // switchTime 0 → just continue without a pause
     }
     if(tPhase==='switch'){
-      if(settings.beepOn&&tLeft<=3&&tLeft>0)playSound(tLeft===1?'countdownFinal':'countdown');
+      if(settings.beepOn&&tLeft>0)playSound('countIn');
       tLeft--;
       const total=eSwitch();const circ=2*Math.PI*54;
       document.getElementById('arc')?.setAttribute('stroke-dashoffset',(circ*(1-tLeft/total)).toFixed(1));
       const n=document.getElementById('tnum');if(n)n.textContent=tLeft;
-      if(tLeft<=0){clearInterval(tInterval);tInterval=null;tPhase='stretch';tLeft=switchReturn;if(settings.prepBeepOn)playSound('prepEnd');renderTimer();keepRunning();}
+      if(tLeft<=0){clearInterval(tInterval);tInterval=null;tPhase='stretch';tLeft=switchReturn;if(settings.beepOn)playSound('go');renderTimer();keepRunning();}
       return;
     }
     if(tPhase==='stretch'&&settings.beepOn&&tLeft<=3&&tLeft>0)playSound(tLeft===1?'countdownFinal':'countdown');
+    if(tPhase==='prep'&&settings.prepBeepOn&&tLeft>0)playSound('countIn');
     if(tPhase==='stretch'&&tLeft===10&&s.dur>15)speak('Ten seconds');
     // PNF cycle: ease-in for first ~third, then alternate 6s tense / 8s relax
     if(tPhase==='stretch'&&s.pnf){
@@ -1571,7 +1574,7 @@ function tickT(){
     const n=document.getElementById('tnum');if(n)n.textContent=tLeft;
     if(tLeft<=0){
       clearInterval(tInterval);tInterval=null;stopBreathPacer();
-      if(tPhase==='prep'){tPhase='stretch';tLeft=sessionStretches[tIdx].dur;sideSwitched=false;if(settings.prepBeepOn)playSound('prepEnd');speak(sessionStretches[tIdx].name);renderTimer();keepRunning();}
+      if(tPhase==='prep'){tPhase='stretch';tLeft=sessionStretches[tIdx].dur;sideSwitched=false;if(settings.prepBeepOn)playSound('go');speak(sessionStretches[tIdx].name);renderTimer();keepRunning();}
       else{tIdx++;sideSwitched=false;pnfTensing=false;if(tIdx<sessionStretches.length){tPhase=ePrep()>0?'prep':'stretch';tLeft=tPhase==='prep'?ePrep():sessionStretches[tIdx].dur;}renderTimer();keepRunning();}
     }
   },1000);
