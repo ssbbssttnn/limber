@@ -809,6 +809,7 @@ const PhotoDB=(function(){
 // write-through helpers: update in-memory mirror + persist to IDB (async, non-blocking)
 function putUserImg(id,dataUrl){userImgs[id]=dataUrl;PhotoDB.set(id,dataUrl);}
 function removeUserImg(id){delete userImgs[id];PhotoDB.del(id);}
+let session=JSON.parse(localStorage.getItem('sx-session')||'[]');
 let history=JSON.parse(localStorage.getItem('sx-history')||'[]');
 let settings=JSON.parse(localStorage.getItem('sx-settings')||'{"prepTime":4,"switchTime":4,"beepOn":true,"sideOn":true,"prepBeepOn":true,"breathOn":true,"voiceOn":false,"volume":0.8,"soundWave":"sine","soundPitch":1,"theme":"blueprint","upNextLead":10}');
 if(settings.upNextLead===undefined)settings.upNextLead=10;
